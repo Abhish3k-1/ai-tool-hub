@@ -32,6 +32,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const signInWithGoogle = async () => {
         try {
+            const isLocalhost =
+                typeof window !== 'undefined' &&
+                (window.location.hostname === 'localhost' ||
+                    window.location.hostname === '127.0.0.1');
+
+            // Redirect flow is more reliable on deployed domains (Vercel, custom domains).
+            if (!isLocalhost) {
+                await signInWithRedirect(auth, provider);
+                return;
+            }
+
             await signInWithPopup(auth, provider);
         } catch (error: unknown) {
             const err = error as { code?: string; message?: string };
@@ -55,7 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             if (code === 'auth/unauthorized-domain') {
                 console.error(
-                    'Firebase unauthorized-domain: add your app domain (for local dev, localhost) in Firebase Console > Authentication > Settings > Authorized domains.'
+                    'Firebase unauthorized-domain: add your deployed domain in Firebase Console > Authentication > Settings > Authorized domains.'
                 );
             }
 
