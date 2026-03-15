@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/lib/auth";
+import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Tools Platform",
+  title: "AI Tools Hub",
   description: "A comprehensive dashboard for various AI tools",
 };
 
@@ -29,13 +30,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col`}
       >
-        <AuthProvider>
+        <Providers>
           <Navbar />
           <main className="flex-1">
             {children}
           </main>
-        </AuthProvider>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
 }
+

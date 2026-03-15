@@ -1,61 +1,258 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { useState } from 'react';
-import { Plus, Trash2, Save, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { FileText, Save, Clock, Trash2, Plus, Loader2 } from 'lucide-react';
+import { useAuth } from '@/lib/auth';
+import { useToast } from '@/components/Toast';
+import { db } from '@/lib/firebase';
+import { collection, query, where, orderBy, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+
+interface Note {
+    id: string;
+    title: string;
+    content: string;
+    created_at: string;
+    user_email: string;
+}
 
 export default function NotesPage() {
-    const [notes] = useState([{ id: 1, title: 'Meeting Notes', content: 'Discussed project architecture...' }]);
+    const { user } = useAuth();
+    const { showToast } = useToast();
+    const [notes, setNotes] = useState<Note[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    
+    const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
+
+    useEffect(() => {
+        if (!user?.email) return;
+
+        async function fetchNotes() {
+            try {
+                const q = query(
+                    collection(db, 'notes'),
+                    where('user_email', '==', user!.email!),
+                    orderBy('created_at', 'desc')
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const fetchedNotes = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                })) as Note[];
+                
+                setNotes(fetchedNotes);
+            } catch (err: any) {
+                console.error('Error fetching notes:', err);
+                if (err.message && err.message.includes('requires an index')) {
+                    console.warn('Firestore index required: Please check your console browser logs for the link to create it.');
+                }
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchNotes();
+    }, [user]);
+
+    const handleSave = async () => {
+        if (!user?.email || (!title.trim() && !content.trim())) return;
+
+        setSaving(true);
+        try {
+            if (activeNoteId) {
+                // Update existing
+                const noteRef = doc(db, 'notes', activeNoteId);
+                await updateDoc(noteRef, {
+                    title: title || 'Untitled Note',
+                    content
+                });
+                
+                setNotes(notes.map(n => n.id === activeNoteId ? { ...n, title: title || 'Untitled Note', content } : n));
+                showToast('Note updated successfully!', 'success');
+            } else {
+                // Create new
+                const newNoteData = {
+                    title: title || 'Untitled Note',
+                    content,
+                    user_email: user.email,
+                    created_at: new Date().toISOString(),
+                };
+                
+                const docRef = await addDoc(collection(db, 'notes'), newNoteData);
+                
+                const newNote: Note = {
+                    id: docRef.id,
+                    ...newNoteData
+                };
+                
+                setNotes([newNote, ...notes]);
+                setActiveNoteId(docRef.id);
+                showToast('Note saved successfully!', 'success');
+            }
+        } catch (err) {
+            console.error('Error saving note:', err);
+            showToast('Failed to save note. Ensure Firestore rules allow writes!', 'error');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleDelete = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation(); // prevent setting active note
+        
+        // Prevent double-click
+        if (deletingId) return;
+        setDeletingId(id);
+
+        try {
+            await deleteDoc(doc(db, 'notes', id));
+            
+            setNotes(notes.filter(n => n.id !== id));
+            if (activeNoteId === id) {
+                handleNewNote();
+            }
+            showToast('Note deleted successfully.', 'success');
+        } catch (err) {
+            console.error('Error deleting note:', err);
+            showToast('Failed to delete note. Ensure Firestore rules allow deletes!', 'error');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    const handleNoteClick = (note: Note) => {
+        setActiveNoteId(note.id);
+        setTitle(note.title);
+        setContent(note.content);
+    };
+
+    const handleNewNote = () => {
+        setActiveNoteId(null);
+        setTitle('');
+        setContent('');
+    };
+
+    const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
 
     return (
         <ProtectedRoute>
-            <div className="container mx-auto px-4 py-8 max-w-5xl animate-fade-in">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-500 rounded-xl flex items-center justify-center shadow-sm">
+            <div className="container mx-auto px-4 py-8 max-w-6xl animate-fade-in">
+                <div className="mb-8 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-3 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl">
                             <FileText className="w-6 h-6" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">My Notes</h1>
-                            <p className="text-gray-500 dark:text-gray-400">Manage and organize your personal notes securely.</p>
+                            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">AI Notes Saver</h1>
+                            <p className="text-gray-500 dark:text-gray-400">Capture and organize your thoughts.</p>
                         </div>
                     </div>
-                    <button className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-sm active:scale-95">
-                        <Plus className="w-5 h-5" />
-                        New Note
-                    </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="md:col-span-1 space-y-4">
-                        {notes.map(note => (
-                            <div key={note.id} className="p-5 bg-white dark:bg-gray-900 rounded-2xl border-2 border-emerald-500/20 dark:border-emerald-500/30 cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500 transition-colors shadow-sm">
-                                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{note.title}</h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">{note.content}</p>
-                            </div>
-                        ))}
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+                    {/* Saved Notes Section */}
+                    <div className="space-y-4 lg:col-span-1 order-2 lg:order-1">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                <Clock className="w-4 h-4" /> Recent Notes
+                            </h3>
+                            <Button variant="ghost" size="sm" onClick={handleNewNote} className="h-8 hover:bg-emerald-50 text-emerald-600 dark:hover:bg-emerald-500/10 dark:text-emerald-400">
+                                <Plus className="w-4 h-4" />
+                            </Button>
+                        </div>
+
+                        <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 pb-4">
+                            {loading ? (
+                                <div className="flex justify-center py-8">
+                                    <Loader2 className="w-6 h-6 animate-spin text-emerald-500" />
+                                </div>
+                            ) : notes.length === 0 ? (
+                                <div className="text-center py-8 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
+                                    <p className="text-sm text-gray-500">No notes yet.</p>
+                                </div>
+                            ) : (
+                                notes.map((note) => (
+                                    <Card 
+                                        key={note.id} 
+                                        onClick={() => handleNoteClick(note)}
+                                        className={`group transition-all cursor-pointer ${
+                                            activeNoteId === note.id 
+                                                ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10' 
+                                                : 'hover:border-emerald-300 dark:hover:border-emerald-500/30'
+                                        }`}
+                                    >
+                                        <CardContent className="p-4 flex flex-col gap-2">
+                                            <div className="flex justify-between items-start">
+                                                <h4 className="font-medium text-gray-900 dark:text-white line-clamp-1">{note.title || 'Untitled Note'}</h4>
+                                                <button 
+                                                    onClick={(e) => handleDelete(note.id, e)}
+                                                    disabled={deletingId === note.id}
+                                                    className="text-gray-400 opacity-0 group-hover:opacity-100 hover:text-red-500 transition-all disabled:opacity-50"
+                                                >
+                                                    {deletingId === note.id ? (
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                    ) : (
+                                                        <Trash2 className="w-4 h-4" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                                                {note.content || 'No content...'}
+                                            </p>
+                                            <span className="text-xs text-gray-400 mt-1">
+                                                {new Date(note.created_at).toLocaleDateString()}
+                                            </span>
+                                        </CardContent>
+                                    </Card>
+                                ))
+                            )}
+                        </div>
                     </div>
 
-                    <div className="md:col-span-2 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 md:p-8 min-h-[500px] flex flex-col shadow-sm">
-                        <input
-                            type="text"
-                            placeholder="Note Title"
-                            className="text-2xl font-bold bg-transparent border-none outline-none text-gray-900 dark:text-white mb-6 w-full placeholder:text-gray-300 dark:placeholder:text-gray-700"
-                            defaultValue="Meeting Notes"
-                        />
-                        <textarea
-                            className="flex-1 bg-transparent border-none outline-none text-gray-700 dark:text-gray-300 resize-none w-full placeholder:text-gray-300 dark:placeholder:text-gray-700 leading-relaxed"
-                            placeholder="Write your note here..."
-                            defaultValue="Discussed project architecture..."
-                        />
-                        <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
-                            <button className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors font-medium">
-                                <Trash2 className="w-4 h-4" /> Delete
-                            </button>
-                            <button className="flex items-center gap-2 px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 rounded-lg transition-colors font-medium shadow-sm">
-                                <Save className="w-4 h-4" /> Save Note
-                            </button>
-                        </div>
+                    {/* Editor Section */}
+                    <div className="lg:col-span-3 space-y-4 order-1 lg:order-2">
+                        <Card className="border-emerald-100 dark:border-emerald-500/10 shadow-sm h-full flex flex-col transition-all">
+                            <CardHeader className="pb-4">
+                                <CardTitle className="text-lg flex items-center gap-2">
+                                    {activeNoteId ? 'Edit Note' : 'New Note'}
+                                </CardTitle>
+                                <CardDescription>Write down your ideas, summaries, or quick thoughts.</CardDescription>
+                                <Input 
+                                    className="mt-4 text-lg font-semibold bg-transparent border-0 border-b border-gray-100 dark:border-white/10 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-emerald-500" 
+                                    placeholder="Note Title" 
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                />
+                            </CardHeader>
+                            <CardContent className="flex-1 pb-0">
+                                <Textarea
+                                    className="min-h-[400px] md:min-h-[500px] h-full resize-y border-0 bg-transparent px-0 py-2 focus-visible:ring-0 text-base shadow-none leading-relaxed"
+                                    placeholder="Start typing your note here..."
+                                    value={content}
+                                    onChange={(e) => setContent(e.target.value)}
+                                />
+                            </CardContent>
+                            <CardFooter className="flex justify-between items-center bg-gray-50 dark:bg-[#0A0A0B] py-4 border-t border-gray-100 dark:border-white/5 rounded-b-xl mt-auto">
+                                <span className="text-xs text-gray-400 font-medium">{wordCount} word{wordCount !== 1 ? 's' : ''}</span>
+                                <Button 
+                                    onClick={handleSave} 
+                                    disabled={saving || (!title.trim() && !content.trim())}
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 transition-all"
+                                >
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                    {saving ? 'Saving...' : 'Save Note'}
+                                </Button>
+                            </CardFooter>
+                        </Card>
                     </div>
                 </div>
             </div>
