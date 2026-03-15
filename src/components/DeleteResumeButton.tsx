@@ -25,11 +25,27 @@ export default function DeleteResumeButton({ resumeId, onDelete }: DeleteResumeB
     const handleDeleteConfirm = async () => {
         setDeleting(true);
         try {
-            if (resumeId) {
-                const supabase = createClient();
-                await supabase.from("resume").delete().eq("id", resumeId);
+            if (!resumeId) {
+                console.error("Delete failed: missing resume id.");
+                return;
             }
-            // Since we removed DB login, we just clear the local state when the user is done.
+
+            const supabase = createClient();
+            const { data: deletedRows, error: deleteError } = await supabase
+                .from("resume")
+                .delete()
+                .eq("id", resumeId)
+                .select("id");
+
+            if (deleteError) {
+                console.error("Delete failed:", deleteError.message ?? deleteError);
+                return;
+            }
+            if (!deletedRows || deletedRows.length === 0) {
+                console.error("Delete failed: no matching resume row found in database.");
+                return;
+            }
+
             if (onDelete) {
                 onDelete();
             } else {

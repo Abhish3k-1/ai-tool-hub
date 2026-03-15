@@ -242,16 +242,39 @@ export default function BuilderForm() {
             // Save to Supabase
             try {
                 const supabase = createClient();
-                const { error: saveError } = await supabase
+                const payload = {
+                    target_role: resumeData.targetRole,
+                    generated_html: html,
+                    user_id: user?.uid || null,
+                    resume_data: resumeData,
+                };
+
+                let saveError: { code?: string; message?: string; details?: string; hint?: string } | null = null;
+
+                const { error: insertError } = await supabase
                     .from("resume")
-                    .insert([
-                        {
-                            target_role: resumeData.targetRole,
-                            generated_html: html,
-                            user_id: user?.uid || null,
-                            resume_data: resumeData,
-                        },
-                    ]);
+                    .insert([payload]);
+
+                if (insertError) {
+                    const isDuplicateForUser =
+                        !!user?.uid &&
+                        (insertError.code === "23505" ||
+                            /duplicate key/i.test(insertError.message || ""));
+
+                    if (isDuplicateForUser) {
+                        const { error: updateError } = await supabase
+                            .from("resume")
+                            .update({
+                                target_role: payload.target_role,
+                                generated_html: payload.generated_html,
+                                resume_data: payload.resume_data,
+                            })
+                            .eq("user_id", user.uid);
+                        saveError = updateError ?? null;
+                    } else {
+                        saveError = insertError;
+                    }
+                }
 
                 if (saveError) {
                     console.error("Supabase Save Error Details:", saveError.message, saveError.details, saveError.hint);
