@@ -1,19 +1,26 @@
 'use client';
 
 import { useAuth } from '@/lib/auth';
+import { useToast } from '@/components/Toast';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { user, loading } = useAuth();
+    const { showToast } = useToast();
     const router = useRouter();
     const pathname = usePathname();
+    const hasNotifiedRef = useRef(false);
 
     useEffect(() => {
         if (!loading && !user && pathname !== '/') {
+            if (!hasNotifiedRef.current) {
+                showToast('Please sign in first to continue.', 'warning');
+                hasNotifiedRef.current = true;
+            }
             router.push('/');
         }
-    }, [user, loading, pathname, router]);
+    }, [user, loading, pathname, router, showToast]);
 
     if (loading) {
         return (

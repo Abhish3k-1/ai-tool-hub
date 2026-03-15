@@ -34,8 +34,6 @@ function sanitizeCloneTree(root: HTMLElement) {
         node.style.boxShadow = "none";
         node.style.textShadow = "none";
         node.style.backgroundImage = "none";
-        node.style.backgroundColor = "#ffffff";
-        node.style.color = "#111111";
     });
 
     root.style.width = "210mm";
@@ -43,8 +41,6 @@ function sanitizeCloneTree(root: HTMLElement) {
     root.style.margin = "0";
     root.style.transform = "none";
     root.style.overflow = "hidden";
-    root.style.backgroundColor = "#ffffff";
-    root.style.color = "#111111";
 }
 
 async function waitForFonts() {

@@ -3,13 +3,16 @@
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ToolCard from '@/components/ToolCard';
 import { useAuth } from '@/lib/auth';
+import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import {
     ArrowUpRight,
     Briefcase,
     Clock3,
     FileText,
     FileType,
+    FolderOpen,
     ShieldCheck,
     Sparkles,
     Youtube,
@@ -19,6 +22,48 @@ import {
 export default function DashboardPage() {
     const { user } = useAuth();
     const firstName = user?.displayName?.split(' ')[0] || 'Builder';
+    const [hasGeneratedResume, setHasGeneratedResume] = useState(false);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchResumeStatus = async () => {
+            if (!user?.uid) {
+                if (isMounted) setHasGeneratedResume(false);
+                return;
+            }
+
+            try {
+                const supabase = createClient();
+                const { data, error } = await supabase
+                    .from('resume')
+                    .select('id')
+                    .eq('user_id', user.uid)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (!isMounted) return;
+
+                if (error) {
+                    console.error('Failed to check resume status:', error);
+                    setHasGeneratedResume(false);
+                    return;
+                }
+
+                setHasGeneratedResume(!!data);
+            } catch (error) {
+                console.error('Failed to check resume status:', error);
+                if (isMounted) setHasGeneratedResume(false);
+            }
+        };
+
+        fetchResumeStatus();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [user?.uid]);
 
     const overviewStats = [
         {
@@ -96,6 +141,13 @@ export default function DashboardPage() {
                                 >
                                     Open Notes
                                     <ArrowUpRight className="h-4 w-4" />
+                                </Link>
+                                <Link
+                                    href="/tools/resume/my-resume"
+                                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:bg-sky-50/70"
+                                >
+                                    <FolderOpen className="h-4 w-4" />
+                                    {hasGeneratedResume ? 'My Resume' : 'No Resume Generated'}
                                 </Link>
                             </div>
                         </div>

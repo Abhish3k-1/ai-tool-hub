@@ -11,11 +11,11 @@ export default function Sidebar() {
     const [expanded, setExpanded] = useState(false);
 
     const menuItems = [
-        { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', color: 'text-sky-500' },
-        { href: '/tools/notes', icon: FileText, label: 'Notes Saver', color: 'text-emerald-500' },
-        { href: '/tools/youtube', icon: Youtube, label: 'YouTube Summarizer', color: 'text-rose-500' },
-        { href: '/tools/job-search', icon: Briefcase, label: 'AI Job Search', color: 'text-sky-500' },
-        { href: '/tools/resume', icon: FileType, label: 'AI Resume Maker', color: 'text-cyan-500' },
+        { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', mobileLabel: 'Overview', color: 'text-sky-500' },
+        { href: '/tools/notes', icon: FileText, label: 'Notes Saver', mobileLabel: 'Notes', color: 'text-emerald-500' },
+        { href: '/tools/youtube', icon: Youtube, label: 'YouTube Summarizer', mobileLabel: 'YouTube', color: 'text-rose-500' },
+        { href: '/tools/job-search', icon: Briefcase, label: 'AI Job Search', mobileLabel: 'Jobs', color: 'text-sky-500' },
+        { href: '/tools/resume', icon: FileType, label: 'AI Resume Maker', mobileLabel: 'Resume', color: 'text-cyan-500' },
     ];
 
     return (
@@ -117,7 +117,9 @@ export default function Sidebar() {
                                 )}
                             >
                                 <item.icon className={cn('h-4 w-4', item.color)} />
-                                <span className="truncate">{item.label}</span>
+                                <span className="block w-full truncate text-center leading-tight">
+                                    {item.mobileLabel}
+                                </span>
                             </Link>
                         );
                     })}

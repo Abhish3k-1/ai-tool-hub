@@ -5,7 +5,7 @@ import BuilderForm from "@/components/BuilderForm";
 import ResumePreview from "@/components/ResumePreview";
 import AnimatedLoader from "@/components/AnimatedLoader";
 import Link from "next/link";
-import { FileType, LayoutTemplate, FolderOpen } from "lucide-react";
+import { FileType, LayoutTemplate } from "lucide-react";
 import { getTemplateById } from "@/lib/templates";
 
 export default function BuilderPage() {
@@ -31,14 +31,6 @@ export default function BuilderPage() {
                             </p>
                         </div>
                     </div>
-                    {/* My Resume button in the header */}
-                    <Link
-                        href="/tools/resume/my-resume"
-                        className="flex items-center justify-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-semibold text-sky-700 transition-all hover:-translate-y-0.5 hover:bg-sky-100"
-                    >
-                        <FolderOpen className="h-4 w-4" />
-                        My Resume
-                    </Link>
                 </div>
 
                 {/* Template indicator */}

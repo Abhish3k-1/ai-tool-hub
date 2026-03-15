@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ResumeProvider } from "@/context/ResumeContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export const metadata: Metadata = {
   title: "AI Resume Maker — AI Tools Hub",
@@ -13,6 +14,8 @@ export default function ResumeToolLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ResumeProvider>{children}</ResumeProvider>
+    <ProtectedRoute>
+      <ResumeProvider>{children}</ResumeProvider>
+    </ProtectedRoute>
   );
 }
