@@ -27,7 +27,7 @@ export default function DeleteResumeButton({ resumeId, onDelete }: DeleteResumeB
         try {
             if (resumeId) {
                 const supabase = createClient();
-                await supabase.from("resumes").delete().eq("id", resumeId);
+                await supabase.from("resume").delete().eq("id", resumeId);
             }
             // Since we removed DB login, we just clear the local state when the user is done.
             if (onDelete) {

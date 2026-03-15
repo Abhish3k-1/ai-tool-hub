@@ -28,31 +28,33 @@ export default function AuthButton() {
 
     if (loading) {
         return (
-            <button disabled className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-400 font-medium cursor-not-allowed">
-                <Loader2 className="w-4 h-4 animate-spin" />
+            <button disabled className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-500">
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Loading...
             </button>
         );
     }
 
     return user ? (
-        <div className="flex items-center gap-3 sm:gap-4">
-            <div className="hidden sm:flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden items-center gap-2 rounded-xl border border-slate-200/70 bg-white/90 px-2 py-1.5 sm:flex">
                 {user.photoURL ? (
-                    <img src={user.photoURL} alt="Avatar" className="w-8 h-8 rounded-full border border-gray-200" />
+                    <img src={user.photoURL} alt="Avatar" className="h-8 w-8 rounded-full border border-slate-200 object-cover" />
                 ) : (
-                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-sm font-bold text-sky-700">
                         {user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
                     </div>
                 )}
-                <span className="text-sm font-medium text-gray-700">{user.displayName || 'User'}</span>
+                <span className="max-w-[120px] truncate text-sm font-semibold text-slate-700">
+                    {user.displayName || 'User'}
+                </span>
             </div>
             <button
                 onClick={handleSignOut}
                 disabled={isAuthenticating}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-colors font-medium"
+                className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 transition-all hover:-translate-y-0.5 hover:bg-rose-100"
             >
-                {isAuthenticating ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
+                {isAuthenticating ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
                 <span className="hidden sm:inline">Sign Out</span>
             </button>
         </div>
@@ -60,9 +62,9 @@ export default function AuthButton() {
         <button
             onClick={handleSignIn}
             disabled={isAuthenticating}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-all font-medium flex-shrink-0"
+            className="flex flex-shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-600 px-5 py-2.5 font-semibold text-white shadow-[0_8px_24px_rgba(3,105,161,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(3,105,161,0.45)]"
         >
-            {isAuthenticating ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogIn className="w-5 h-5" />}
+            {isAuthenticating ? <Loader2 className="h-5 w-5 animate-spin" /> : <LogIn className="h-5 w-5" />}
             Sign in
         </button>
     );

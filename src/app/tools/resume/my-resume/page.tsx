@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { motion } from "framer-motion";
 import {
     Download,
     LayoutTemplate,
@@ -10,6 +10,9 @@ import {
     Loader2,
 } from "lucide-react";
 import DeleteResumeButton from "@/components/DeleteResumeButton";
+import { useToast } from "@/components/Toast";
+import { generateResumePdf } from "@/lib/resume-pdf";
+import { useAuth } from "@/lib/auth";
 import { createClient } from "@/utils/supabase/client";
 
 interface SavedResume {
@@ -25,15 +28,25 @@ export default function MyResumePage() {
     const [error, setError] = useState("");
     const [isDownloading, setIsDownloading] = useState(false);
     const resumeRef = useRef<HTMLDivElement>(null);
+    const { showToast } = useToast();
+    const { user } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
         async function fetchResume() {
+            if (!user?.uid) {
+                setResume(null);
+                setLoading(false);
+                return;
+            }
+
             try {
+                setLoading(true);
                 const supabase = createClient();
                 const { data, error: fetchError } = await supabase
-                    .from("resumes")
+                    .from("resume")
                     .select("*")
+                    .eq("user_id", user.uid)
                     .order("created_at", { ascending: false })
                     .limit(1)
                     .maybeSingle();
@@ -44,9 +57,9 @@ export default function MyResumePage() {
                 } else if (data) {
                     // Standardize sanitization here too, in case DB has old unsanitized entries
                     const sanitizedHtml = data.generated_html
-                        .replace(/oklch\([^)]*\)/g, '#111827')
-                        .replace(/oklab\([^)]*\)/g, '#111827')
-                        .replace(/lab\([^)]*\)/g, '#111827');
+                        .replace(/oklch\([^)]*\)/g, '#111111')
+                        .replace(/oklab\([^)]*\)/g, '#111111')
+                        .replace(/lab\([^)]*\)/g, '#111111');
                     
                     setResume({
                         ...data,
@@ -61,72 +74,50 @@ export default function MyResumePage() {
             }
         }
         fetchResume();
-    }, [router]);
+    }, [user?.uid]);
 
     const handleDownload = async () => {
-        if (!resumeRef.current || isDownloading) return;
-        
+        if (isDownloading) return;
+
+        // Ensure the HTML content exists before generating the PDF.
+        if (!resume?.generated_html || !resume.generated_html.trim()) {
+            showToast("No resume content to download.", "error");
+            return;
+        }
+
+        const previewElement = resumeRef.current;
+        if (!previewElement) {
+            showToast("Resume preview is not ready yet. Please try again.", "error");
+            return;
+        }
+
         setIsDownloading(true);
         try {
-            const html2canvas = (await import("html2canvas")).default;
-            const { jsPDF } = await import("jspdf");
-
-            window.scrollTo(0, 0);
-
-            const canvas = await html2canvas(resumeRef.current, {
-                scale: 1.5,
-                useCORS: true,
-                backgroundColor: "#ffffff",
-                logging: false,
-                onclone: (clonedDoc) => {
-                    const container = clonedDoc.querySelector('.resume-preview-container') as HTMLElement;
-                    if (container) {
-                        container.style.transform = 'none';
-                        container.style.margin = '0';
-                        container.style.width = '210mm';
-                        
-                        const allElements = container.querySelectorAll('*');
-                        allElements.forEach(el => {
-                            const htmlEl = el as HTMLElement;
-                            if (htmlEl.style) {
-                                const style = htmlEl.getAttribute('style') || '';
-                                if (style.includes('oklch') || style.includes('oklab') || style.includes('lab(')) {
-                                    const sanitized = style
-                                        .replace(/oklch\([^)]*\)/g, '#111827')
-                                        .replace(/oklab\([^)]*\)/g, '#111827')
-                                        .replace(/lab\([^)]*\)/g, '#111827');
-                                    htmlEl.setAttribute('style', sanitized);
-                                }
-                            }
-                        });
-                    }
-                }
-            });
-
-            const imgData = canvas.toDataURL('image/jpeg', 0.98);
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4'
-            });
-
-            pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
-            pdf.save('resume.pdf');
-        } catch (error: any) {
+            await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+            await generateResumePdf({ element: previewElement, fileName: "resume.pdf" });
+            showToast("Resume PDF downloaded successfully.", "success");
+        } catch (error: unknown) {
             console.error("PDF generation failed:", error);
-            alert("Sorry, we couldn't generate your PDF. This can happen if the resume content is too large or contains complex styles. Please try again or use the browser Print option (Ctrl+P).");
+            const message = error instanceof Error ? error.message : "Sorry, we couldn't generate your PDF. Please try again.";
+            showToast(
+                message,
+                "error"
+            );
         } finally {
-            setTimeout(() => {
-                setIsDownloading(false);
-            }, 500);
+            setIsDownloading(false);
         }
     };
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-5xl">
-            <div className="mb-8">
+        <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6"
+        >
+            <div className="glass-panel mb-8 rounded-3xl p-5 sm:p-7">
                 <div className="flex items-center gap-3">
-                    <div className="p-3 bg-purple-100 text-purple-600 rounded-xl">
+                    <div className="rounded-xl bg-sky-100 p-3 text-sky-600 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
                         <FileText className="w-6 h-6" />
                     </div>
                     <div>
@@ -141,7 +132,7 @@ export default function MyResumePage() {
             {/* Loading state */}
             {loading && (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
-                    <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-sky-500 animate-spin" />
                     <p className="text-gray-500">Loading your resume...</p>
                 </div>
             )}
@@ -158,8 +149,8 @@ export default function MyResumePage() {
             {/* Empty state */}
             {!loading && !error && !resume && (
                 <div className="flex flex-col items-center justify-center py-24 gap-6">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-indigo-50 border border-indigo-100">
-                        <FileText className="h-10 w-10 text-indigo-500" />
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-sky-100 bg-sky-50">
+                        <FileText className="h-10 w-10 text-sky-500" />
                     </div>
                     <div className="text-center">
                         <h2 className="text-xl font-semibold text-gray-900">
@@ -172,7 +163,7 @@ export default function MyResumePage() {
                     </div>
                     <button
                         onClick={() => router.push("/tools/resume/templates")}
-                        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md transition-all cursor-pointer"
+                        className="flex items-center gap-2 rounded-xl bg-sky-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-700 hover:shadow-[0_14px_30px_rgba(3,105,161,0.35)] cursor-pointer"
                     >
                         <LayoutTemplate className="h-4 w-4" />
                         Choose a Template
@@ -184,7 +175,7 @@ export default function MyResumePage() {
             {!loading && !error && resume && (
                 <div className="flex flex-col items-center gap-8">
                     {/* Meta info + Actions */}
-                    <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl border border-gray-200 bg-white shadow-sm">
+                    <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg">
                         <div>
                             <p className="text-sm text-gray-500">Target Role</p>
                             <p className="text-lg font-semibold text-gray-900">
@@ -208,7 +199,7 @@ export default function MyResumePage() {
                             <button
                                 onClick={() => router.push("/tools/resume/templates")}
                                 disabled={isDownloading}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <LayoutTemplate className="h-4 w-4" />
                                 New Resume
@@ -216,7 +207,7 @@ export default function MyResumePage() {
                             <button
                                 onClick={handleDownload}
                                 disabled={isDownloading}
-                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-md transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center gap-2 rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-700 hover:shadow-[0_14px_30px_rgba(3,105,161,0.35)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isDownloading ? (
                                     <>
@@ -236,8 +227,9 @@ export default function MyResumePage() {
 
                     {/* Resume document */}
                     <div className="w-full flex justify-center pb-8 overflow-hidden rounded-xl bg-gray-50">
-                        <div className="rounded-sm border border-gray-200 bg-white shadow-2xl shrink-0 print:border-none print:shadow-none print:transform-none origin-top transition-transform duration-300 transform scale-[0.4] sm:scale-[0.6] md:scale-[0.8] lg:scale-100">
+                        <div className="rounded-sm border border-gray-200 bg-white shadow-2xl shrink-0 print:border-none print:shadow-none print:transform-none origin-top transition-all duration-500 transform scale-[0.4] sm:scale-[0.6] md:scale-[0.8] lg:scale-100 hover:shadow-[0_24px_60px_rgba(17,24,39,0.16)]">
                             <div
+                                id="resume-preview"
                                 ref={resumeRef}
                                 className="prose prose-sm max-w-none text-black resume-preview-container"
                                 style={{ width: "210mm", minHeight: "297mm", overflowWrap: "break-word", wordWrap: "break-word", overflow: "hidden" }}
@@ -249,6 +241,6 @@ export default function MyResumePage() {
                     </div>
                 </div>
             )}
-        </div>
+        </motion.div>
     );
 }

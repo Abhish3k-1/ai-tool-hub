@@ -2,8 +2,7 @@
 
 import { useResume } from "@/context/ResumeContext";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { LayoutTemplate, ChevronRight, Search, FileText } from "lucide-react";
+import { LayoutTemplate, ChevronRight, Search } from "lucide-react";
 import templates, { ResumeTemplate } from "@/lib/templates";
 import { useState, useMemo } from "react";
 
@@ -11,17 +10,15 @@ const categories = ["All", "Modern", "Classic", "Creative", "Corporate", "Tech"]
 
 function TemplateCard({
     template,
-    index,
     onSelect,
 }: {
     template: ResumeTemplate;
-    index: number;
     onSelect: (id: string) => void;
 }) {
     return (
         <div
             onClick={() => onSelect(template.id)}
-            className="group cursor-pointer rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-200 overflow-hidden"
+            className="group hover-lift glass-card cursor-pointer overflow-hidden rounded-2xl border border-slate-200/70 shadow-sm"
         >
             {/* Preview Stripe */}
             <div
@@ -43,7 +40,7 @@ function TemplateCard({
                 </div>
 
                 {/* Hover overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/35">
                     <span className="hidden group-hover:flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-sm font-semibold text-gray-900 shadow-lg">
                         Use Template
                         <ChevronRight className="h-4 w-4" />
@@ -61,10 +58,10 @@ function TemplateCard({
 
             {/* Info */}
             <div className="p-4">
-                <h3 className="text-base font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                <h3 className="text-base font-semibold text-slate-900 transition-colors group-hover:text-sky-700">
                     {template.name}
                 </h3>
-                <p className="mt-1 text-xs text-gray-500 leading-relaxed">
+                <p className="mt-1 text-xs leading-relaxed text-slate-600">
                     {template.description}
                 </p>
 
@@ -104,18 +101,18 @@ export default function TemplatesPage() {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8">
             {/* Title section */}
-            <div className="mb-8">
+            <div className="glass-panel mb-8 rounded-3xl p-5 sm:p-7">
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="p-3 bg-purple-100 text-purple-600 rounded-xl">
+                    <div className="rounded-2xl bg-sky-100 p-3 text-sky-700 shadow-sm">
                         <LayoutTemplate className="w-6 h-6" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
                             Choose Your Template
                         </h1>
-                        <p className="text-gray-500">
+                        <p className="text-slate-600">
                             Pick a design that matches your style. Each template is ATS-optimized and professionally crafted.
                         </p>
                     </div>
@@ -123,17 +120,17 @@ export default function TemplatesPage() {
             </div>
 
             {/* Filters Row */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+            <div className="glass-card mb-8 flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between">
                 {/* Category pills */}
                 <div className="flex flex-wrap items-center gap-2">
                     {categories.map((cat) => (
                         <button
                             key={cat}
                             onClick={() => setActiveCategory(cat)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                            className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
                                 activeCategory === cat
-                                    ? "bg-indigo-600 text-white shadow-md"
-                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
+                                    ? "bg-gradient-to-r from-sky-600 to-cyan-600 text-white shadow-[0_8px_20px_rgba(3,105,161,0.35)]"
+                                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-slate-900"
                             }`}
                         >
                             {cat}
@@ -142,36 +139,35 @@ export default function TemplatesPage() {
                 </div>
 
                 {/* Search */}
-                <div className="relative w-full sm:w-72">
+                <div className="relative w-full sm:w-80">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                        <Search className="h-4 w-4 text-gray-400" />
+                        <Search className="h-4 w-4 text-slate-400" />
                     </div>
                     <input
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search templates..."
-                        className="w-full rounded-lg border border-gray-200 bg-white pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all"
+                        className="w-full rounded-xl border border-slate-300 bg-white/95 py-2.5 pl-10 pr-4 text-sm text-slate-900 shadow-sm outline-none transition-all focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
                     />
                 </div>
             </div>
 
             {/* Grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredTemplates.map((template, i) => (
+                {filteredTemplates.map((template) => (
                     <TemplateCard
                         key={template.id}
                         template={template}
-                        index={i}
                         onSelect={handleSelect}
                     />
                 ))}
             </div>
 
             {filteredTemplates.length === 0 && (
-                <div className="text-center py-20 text-gray-400">
+                <div className="py-20 text-center text-slate-400">
                     <LayoutTemplate className="h-12 w-12 mx-auto mb-4 opacity-40" />
-                    <p className="text-lg font-medium">No templates found</p>
+                    <p className="text-lg font-medium text-slate-700">No templates found</p>
                     <p className="text-sm mt-1">Try a different search or category</p>
                 </div>
             )}

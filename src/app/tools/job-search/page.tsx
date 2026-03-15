@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Briefcase, Search, ExternalLink, Loader2, Building2 } from 'lucide-react';
 
@@ -46,8 +46,9 @@ export default function JobSearchPage() {
             }
 
             setJobs(data.jobs || []);
-        } catch (err: any) {
-            setError(err.message || 'Something went wrong');
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Something went wrong';
+            setError(message);
             setJobs([]);
         } finally {
             setLoading(false);
@@ -56,20 +57,20 @@ export default function JobSearchPage() {
 
     return (
         <ProtectedRoute>
-            <div className="container mx-auto px-4 py-8 max-w-5xl animate-fade-in">
+            <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 page-enter">
                 <div className="mb-8 flex items-center gap-3">
-                    <div className="p-3 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl">
+                    <div className="rounded-2xl bg-sky-100 p-3 text-sky-700 shadow-sm">
                         <Briefcase className="w-6 h-6" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">AI Job Search</h1>
-                        <p className="text-gray-500 dark:text-gray-400">Find the most relevant roles curated for you.</p>
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">AI Job Search</h1>
+                        <p className="text-slate-600">Find the most relevant roles curated for you.</p>
                     </div>
                 </div>
 
                 <div className="space-y-8">
                     {/* Search Section */}
-                    <Card className="border-blue-100 dark:border-blue-500/10 shadow-sm bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-950 dark:to-blue-950/10">
+                    <Card className="border-sky-200/80 bg-gradient-to-br from-white to-sky-50/60 shadow-sm">
                         <CardContent className="pt-6">
                             <form 
                                 onSubmit={handleSearch}
@@ -84,13 +85,13 @@ export default function JobSearchPage() {
                                         placeholder="Job title, keywords, or company..."
                                         value={query}
                                         onChange={(e) => setQuery(e.target.value)}
-                                        className="pl-10 h-14 text-lg border-gray-200 focus-visible:ring-blue-500 bg-white dark:bg-gray-900"
+                                        className="h-14 bg-white pl-10 text-lg"
                                     />
                                 </div>
                                 <Button 
                                     type="submit"
                                     disabled={loading || !query.trim()}
-                                    className="h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white gap-2 shadow-md shadow-blue-500/20 text-base"
+                                    className="h-14 gap-2 bg-gradient-to-r from-sky-600 to-blue-600 px-8 text-base text-white"
                                 >
                                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
                                     {loading ? 'Searching...' : 'Find Jobs'}
@@ -98,7 +99,7 @@ export default function JobSearchPage() {
                             </form>
                             
                             {error && (
-                                <p className="mt-4 text-sm font-medium text-red-600 bg-red-50 p-3 rounded-lg border border-red-100">
+                                <p className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-700">
                                     {error}
                                 </p>
                             )}
@@ -108,32 +109,32 @@ export default function JobSearchPage() {
                     {/* Results Section */}
                     <div className="space-y-4">
                         <div className="flex justify-between items-end px-1">
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Search Results</h3>
+                            <h3 className="text-xl font-semibold text-slate-900">Search Results</h3>
                             {hasSearched && !loading && (
-                                <span className="text-sm text-gray-500">Found {jobs.length} top matches</span>
+                                <span className="text-sm text-slate-500">Found {jobs.length} top matches</span>
                             )}
                         </div>
 
                         {/* Loading State */}
                         {loading && (
-                            <Card className="min-h-[300px] border-dashed border-2 border-blue-200 bg-blue-50/50 flex flex-col items-center justify-center shadow-none text-blue-600 space-y-4">
+                            <Card className="flex min-h-[300px] flex-col items-center justify-center space-y-4 border-dashed border-2 border-sky-200 bg-sky-50/70 text-sky-700 shadow-none">
                                 <Loader2 className="w-10 h-10 animate-spin" />
                                 <div className="text-center">
                                     <p className="font-medium animate-pulse">Scanning the web for the best opportunities...</p>
-                                    <p className="text-sm text-blue-500/80 mt-1">This usually takes a few seconds.</p>
+                                    <p className="mt-1 text-sm text-sky-600/80">This usually takes a few seconds.</p>
                                 </div>
                             </Card>
                         )}
 
                         {/* Empty/Initial State */}
                         {!hasSearched && !loading && (
-                            <Card className="min-h-[300px] border-dashed border-2 border-gray-200 bg-gray-50 flex items-center justify-center relative shadow-none">
+                            <Card className="relative flex min-h-[300px] items-center justify-center border-dashed border-2 border-slate-200 bg-slate-50 shadow-none">
                                 <div className="text-center p-8 max-w-sm">
                                     <div className="mx-auto w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-4 border border-blue-100">
                                         <Briefcase className="w-8 h-8 text-blue-400" />
                                     </div>
-                                    <h4 className="text-gray-900 font-medium mb-2">No searches yet</h4>
-                                    <p className="text-sm text-gray-500">
+                                    <h4 className="mb-2 font-medium text-slate-900">No searches yet</h4>
+                                    <p className="text-sm text-slate-500">
                                         Enter a job title or keyword above and hit search to find open roles via Firecrawl AI.
                                     </p>
                                 </div>
@@ -142,28 +143,28 @@ export default function JobSearchPage() {
 
                         {/* No Jobs Found Status */}
                         {hasSearched && !loading && jobs.length === 0 && !error && (
-                            <Card className="min-h-[200px] border border-gray-200 bg-gray-50 flex items-center justify-center">
-                                <p className="text-gray-500 font-medium">No job postings found for "{query}". Try a broader term.</p>
+                            <Card className="flex min-h-[200px] items-center justify-center border border-slate-200 bg-slate-50">
+                                <p className="font-medium text-slate-500">No job postings found for &quot;{query}&quot;. Try a broader term.</p>
                             </Card>
                         )}
 
                         {/* Results Grid */}
                         <div className="grid gap-4">
                             {!loading && jobs.map((job, i) => (
-                                <Card key={i} className="hover:border-blue-300 dark:hover:border-blue-500/30 transition-all hover:shadow-md group">
+                                <Card key={i} className="group transition-all hover:border-sky-300 hover:shadow-md">
                                     <CardContent className="p-5 sm:p-6 flex flex-col sm:flex-row gap-5 items-start sm:items-center">
-                                        <div className="w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-800 flex shrink-0 items-center justify-center border border-gray-200 dark:border-gray-700">
-                                            <Building2 className="w-8 h-8 text-gray-400" />
+                                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-100">
+                                            <Building2 className="w-8 h-8 text-slate-400" />
                                         </div>
                                         <div className="flex-grow space-y-2 w-full">
                                             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                                                 <div>
-                                                    <h4 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                                    <h4 className="text-lg font-semibold text-slate-900 transition-colors group-hover:text-sky-700">
                                                         {job.title}
                                                     </h4>
                                                 </div>
                                             </div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                            <p className="line-clamp-2 text-sm text-slate-600">
                                                 {job.description}
                                             </p>
                                         </div>
@@ -174,7 +175,7 @@ export default function JobSearchPage() {
                                                 rel="noopener noreferrer"
                                                 className="block w-full sm:w-auto"
                                             >
-                                                <Button variant="outline" className="w-full sm:w-auto group-hover:bg-blue-50 border-gray-200 text-blue-600 font-medium">
+                                                <Button variant="outline" className="w-full sm:w-auto border-slate-200 font-semibold text-sky-700 group-hover:bg-sky-50">
                                                     View Job <ExternalLink className="ml-2 w-4 h-4" />
                                                 </Button>
                                             </a>

@@ -38,8 +38,9 @@ export default function YoutubeSummarizerPage() {
             }
 
             setSummary(data.summary);
-        } catch (err: any) {
-            setError(err.message || 'Something went wrong');
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Something went wrong';
+            setError(message);
         } finally {
             setLoading(false);
         }
@@ -47,20 +48,20 @@ export default function YoutubeSummarizerPage() {
 
     return (
         <ProtectedRoute>
-            <div className="container mx-auto px-4 py-8 max-w-4xl animate-fade-in">
+            <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 page-enter">
                 <div className="mb-8 flex items-center gap-3">
-                    <div className="p-3 bg-red-100 text-red-600 rounded-xl">
+                    <div className="rounded-2xl bg-rose-100 p-3 text-rose-700 shadow-sm">
                         <Youtube className="w-6 h-6" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">YouTube AI Summarizer</h1>
-                        <p className="text-gray-500">Turn long videos into quick readable summaries.</p>
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">YouTube AI Summarizer</h1>
+                        <p className="text-slate-600">Turn long videos into quick readable summaries.</p>
                     </div>
                 </div>
 
                 <div className="space-y-8">
                     {/* Input Section */}
-                    <Card className="border-red-100 shadow-sm overflow-hidden relative">
+                    <Card className="relative overflow-hidden border-rose-200/70 shadow-sm">
                         {/* Decorative background pulse */}
                         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-red-500/5 blur-3xl pointer-events-none" />
 
@@ -85,20 +86,20 @@ export default function YoutubeSummarizerPage() {
                                         placeholder="https://www.youtube.com/watch?v=..."
                                         value={url}
                                         onChange={(e) => setUrl(e.target.value)}
-                                        className="pl-10 h-12 text-base border-gray-200 focus-visible:ring-red-500 bg-white"
+                                        className="h-12 bg-white pl-10 text-base"
                                     />
                                 </div>
                                 <Button 
                                     type="submit"
                                     disabled={loading || !url.trim()}
-                                    className="h-12 px-8 bg-red-600 hover:bg-red-700 text-white gap-2 shadow-md shadow-red-500/20"
+                                    className="h-12 gap-2 bg-gradient-to-r from-rose-600 to-red-600 px-8 text-white"
                                 >
                                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
                                     {loading ? 'Processing...' : 'Summarize'}
                                 </Button>
                             </form>
                             {error && (
-                                <p className="mt-3 text-sm font-medium text-red-600 bg-red-50 p-3 rounded-lg border border-red-100">
+                                <p className="mt-3 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-700">
                                     {error}
                                 </p>
                             )}
@@ -107,16 +108,16 @@ export default function YoutubeSummarizerPage() {
 
                     {/* Output Section */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-900 px-1">Summary Result</h3>
+                        <h3 className="px-1 text-lg font-semibold text-slate-900">Summary Result</h3>
                         
                         {!summary && !loading && (
-                            <Card className="min-h-[300px] border-dashed border-2 border-gray-200 bg-gray-50 flex items-center justify-center relative shadow-none">
+                            <Card className="relative flex min-h-[300px] items-center justify-center border-dashed border-2 border-slate-200 bg-slate-50 shadow-none">
                                 <div className="text-center p-8 max-w-sm">
                                     <div className="mx-auto w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4 border border-red-100">
                                         <Youtube className="w-8 h-8 text-red-400" />
                                     </div>
-                                    <h4 className="text-gray-900 font-medium mb-2">No summary yet</h4>
-                                    <p className="text-sm text-gray-500">
+                                    <h4 className="mb-2 font-medium text-slate-900">No summary yet</h4>
+                                    <p className="text-sm text-slate-500">
                                         Paste a video URL above and click summarize to see the AI magic happen. Note: The video must have closed captions enabled.
                                     </p>
                                 </div>
@@ -124,22 +125,22 @@ export default function YoutubeSummarizerPage() {
                         )}
 
                         {loading && (
-                            <Card className="min-h-[300px] border-dashed border-2 border-red-200 bg-red-50/50 flex flex-col items-center justify-center shadow-none text-red-600 space-y-4">
+                            <Card className="flex min-h-[300px] flex-col items-center justify-center space-y-4 border-dashed border-2 border-rose-200 bg-rose-50/70 text-rose-700 shadow-none">
                                 <Loader2 className="w-10 h-10 animate-spin" />
                                 <div className="text-center">
                                     <p className="font-medium animate-pulse">Extracting Transcript & Summarizing...</p>
-                                    <p className="text-sm text-red-500/80 mt-1">This usually takes 5-10 seconds depending on the video length.</p>
+                                    <p className="mt-1 text-sm text-rose-600/80">This usually takes 5-10 seconds depending on the video length.</p>
                                 </div>
                             </Card>
                         )}
 
                         {summary && !loading && (
-                            <Card className="border-gray-200 shadow-sm bg-white overflow-hidden">
+                            <Card className="overflow-hidden border-slate-200/70 bg-white shadow-sm">
                                 <CardContent className="p-0">
-                                    <div className="bg-gray-50 border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+                                    <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-6 py-4">
                                         <div className="flex items-center gap-2">
-                                            <Wand2 className="w-4 h-4 text-indigo-600" />
-                                            <span className="font-semibold text-gray-900 text-sm">AI Generated Summary</span>
+                                            <Wand2 className="w-4 h-4 text-sky-600" />
+                                            <span className="text-sm font-semibold text-slate-900">AI Generated Summary</span>
                                         </div>
                                         <Button 
                                             variant="outline" 
@@ -150,7 +151,7 @@ export default function YoutubeSummarizerPage() {
                                             Copy to Clipboard
                                         </Button>
                                     </div>
-                                    <div className="p-6 md:p-8 prose prose-indigo max-w-none prose-sm sm:prose-base text-gray-700 leading-relaxed">
+                                    <div className="max-w-none p-6 text-gray-700 prose prose-sky prose-sm leading-relaxed sm:prose-base md:p-8">
                                         <ReactMarkdown>{summary}</ReactMarkdown>
                                     </div>
                                 </CardContent>

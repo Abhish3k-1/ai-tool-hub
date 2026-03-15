@@ -1,23 +1,21 @@
 "use client";
 
 import ResumePreview from "@/components/ResumePreview";
-import DeleteResumeButton from "@/components/DeleteResumeButton";
-import Link from "next/link";
-import { FileType, FileText } from "lucide-react";
+import { FileType } from "lucide-react";
 
 export default function PreviewPage() {
     return (
-        <div className="container mx-auto px-4 py-8 max-w-5xl">
-            <div className="mb-8">
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+            <div className="glass-panel mb-8 rounded-3xl p-5 sm:p-7">
                 <div className="flex items-center gap-3">
-                    <div className="p-3 bg-purple-100 text-purple-600 rounded-xl">
+                    <div className="rounded-2xl bg-sky-100 p-3 text-sky-700 shadow-sm">
                         <FileType className="w-6 h-6" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
                             Your Resume is Ready
                         </h1>
-                        <p className="text-gray-500">
+                        <p className="text-slate-600">
                             Review your AI-generated resume below and download it as PDF.
                         </p>
                     </div>

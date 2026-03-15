@@ -39,13 +39,13 @@ function SectionCard({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay, duration: 0.4 }}
-            className="rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow-sm hover:shadow-md transition-shadow"
+            className="hover-lift glass-card rounded-3xl border border-slate-200/70 p-6 shadow-sm"
         >
             <div className="flex items-center gap-3 mb-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-cyan-600 shadow-[0_8px_20px_rgba(3,105,161,0.3)]">
                     <Icon className="h-5 w-5 text-white" />
                 </div>
-                <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+                <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
             </div>
             {children}
         </motion.section>
@@ -63,7 +63,7 @@ function Input({
             </label>
             <input
                 {...props}
-                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all"
+                className="w-full rounded-xl border border-slate-300 bg-white/95 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition-all focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
             />
         </div>
     );
@@ -81,7 +81,7 @@ function TextArea({
             <textarea
                 {...props}
                 rows={3}
-                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                className="w-full resize-none rounded-xl border border-slate-300 bg-white/95 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition-all focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
             />
         </div>
     );
@@ -243,13 +243,13 @@ export default function BuilderForm() {
             try {
                 const supabase = createClient();
                 const { error: saveError } = await supabase
-                    .from("resumes")
+                    .from("resume")
                     .insert([
                         {
                             target_role: resumeData.targetRole,
                             generated_html: html,
                             user_id: user?.uid || null,
-                            // resume_data: resumeData, // Commenting out to avoid potential schema mismatch if this field wasn't in original project
+                            resume_data: resumeData,
                         },
                     ]);
 
@@ -259,8 +259,9 @@ export default function BuilderForm() {
                 } else {
                     console.log("Resume saved to Supabase successfully");
                 }
-            } catch (dbErr: any) {
-                console.error("Database connection error:", dbErr.message);
+            } catch (dbErr: unknown) {
+                const message = dbErr instanceof Error ? dbErr.message : "Unknown database error";
+                console.error("Database connection error:", message);
             }
 
         } catch (err) {
@@ -320,10 +321,10 @@ export default function BuilderForm() {
                                 <button
                                     onClick={() => handleGenerateExpDesc(i)}
                                     disabled={generatingExpDesc === i}
-                                    className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center gap-1.5 text-xs font-medium text-sky-500 hover:text-sky-600 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Sparkles className="h-3.5 w-3.5" />
-                                    {generatingExpDesc === i ? "Generating..." : "✨ AI Generate"}
+                                    {generatingExpDesc === i ? "Generating..." : "AI Generate"}
                                 </button>
                             </div>
                             <textarea
@@ -331,12 +332,12 @@ export default function BuilderForm() {
                                 onChange={(e) => updateArrayItem("experience", i, "description", e.target.value)}
                                 rows={4}
                                 placeholder="Key achievements and responsibilities... (Write manually or use AI Generate)"
-                                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500 transition-all resize-none"
                             />
                         </div>
                     </div>
                 ))}
-                <button onClick={() => addItem("experience")} className="flex items-center gap-2 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer">
+                <button onClick={() => addItem("experience")} className="flex items-center gap-2 text-sm font-medium text-sky-500 hover:text-sky-600 transition-colors cursor-pointer">
                     <Plus className="h-4 w-4" /> Add Experience
                 </button>
             </SectionCard>
@@ -361,7 +362,7 @@ export default function BuilderForm() {
                                 </label>
                                 <div className="flex gap-2">
                                     <select
-                                        className="w-1/3 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer appearance-none"
+                                        className="w-1/3 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500 transition-all cursor-pointer appearance-none"
                                         value={edu.gradeType || "cgpa"}
                                         onChange={(e) => updateArrayItem("education", i, "gradeType", e.target.value)}
                                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -374,14 +375,14 @@ export default function BuilderForm() {
                                         placeholder={edu.gradeType === "percentage" ? "e.g. 85" : "e.g. 8.5"}
                                         value={edu.gradeValue || ""}
                                         onChange={(e) => updateArrayItem("education", i, "gradeValue", e.target.value)}
-                                        className="w-2/3 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all"
+                                        className="w-2/3 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500 transition-all"
                                     />
                                 </div>
                             </div>
                         </div>
                     </div>
                 ))}
-                <button onClick={() => addItem("education")} className="flex items-center gap-2 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer">
+                <button onClick={() => addItem("education")} className="flex items-center gap-2 text-sm font-medium text-sky-500 hover:text-sky-600 transition-colors cursor-pointer">
                     <Plus className="h-4 w-4" /> Add Education
                 </button>
             </SectionCard>
@@ -395,7 +396,7 @@ export default function BuilderForm() {
                                 value={skill}
                                 placeholder="e.g. React"
                                 onChange={(e) => updateStringArrayItem("skills", i, e.target.value)}
-                                className="w-36 rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all"
+                                className="w-36 rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500 transition-all"
                             />
                             {resumeData.skills.length > 1 && (
                                 <button onClick={() => removeStringArrayItem("skills", i)} className="p-1 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors cursor-pointer">
@@ -405,7 +406,7 @@ export default function BuilderForm() {
                         </div>
                     ))}
                 </div>
-                <button onClick={() => addStringArrayItem("skills")} className="mt-4 flex items-center gap-2 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer">
+                <button onClick={() => addStringArrayItem("skills")} className="mt-4 flex items-center gap-2 text-sm font-medium text-sky-500 hover:text-sky-600 transition-colors cursor-pointer">
                     <Plus className="h-4 w-4" /> Add Skill
                 </button>
             </SectionCard>
@@ -419,7 +420,7 @@ export default function BuilderForm() {
                                 value={lang}
                                 placeholder="e.g. English"
                                 onChange={(e) => updateStringArrayItem("languages", i, e.target.value)}
-                                className="w-36 rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all"
+                                className="w-36 rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500 transition-all"
                             />
                             {resumeData.languages.length > 1 && (
                                 <button onClick={() => removeStringArrayItem("languages", i)} className="p-1 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors cursor-pointer">
@@ -429,7 +430,7 @@ export default function BuilderForm() {
                         </div>
                     ))}
                 </div>
-                <button onClick={() => addStringArrayItem("languages")} className="mt-4 flex items-center gap-2 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer">
+                <button onClick={() => addStringArrayItem("languages")} className="mt-4 flex items-center gap-2 text-sm font-medium text-sky-500 hover:text-sky-600 transition-colors cursor-pointer">
                     <Plus className="h-4 w-4" /> Add Language
                 </button>
             </SectionCard>
@@ -443,7 +444,7 @@ export default function BuilderForm() {
                                 value={skill}
                                 placeholder="e.g. Leadership"
                                 onChange={(e) => updateStringArrayItem("softSkills", i, e.target.value)}
-                                className="w-36 rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all"
+                                className="w-36 rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500 transition-all"
                             />
                             {resumeData.softSkills.length > 1 && (
                                 <button onClick={() => removeStringArrayItem("softSkills", i)} className="p-1 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors cursor-pointer">
@@ -453,7 +454,7 @@ export default function BuilderForm() {
                         </div>
                     ))}
                 </div>
-                <button onClick={() => addStringArrayItem("softSkills")} className="mt-4 flex items-center gap-2 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer">
+                <button onClick={() => addStringArrayItem("softSkills")} className="mt-4 flex items-center gap-2 text-sm font-medium text-sky-500 hover:text-sky-600 transition-colors cursor-pointer">
                     <Plus className="h-4 w-4" /> Add Soft Skill
                 </button>
             </SectionCard>
@@ -480,10 +481,10 @@ export default function BuilderForm() {
                                 <button
                                     onClick={() => handleGenerateProjectDesc(i)}
                                     disabled={generatingProjectDesc === i}
-                                    className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center gap-1.5 text-xs font-medium text-sky-500 hover:text-sky-600 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Sparkles className="h-3.5 w-3.5" />
-                                    {generatingProjectDesc === i ? "Generating..." : "✨ AI Generate"}
+                                    {generatingProjectDesc === i ? "Generating..." : "AI Generate"}
                                 </button>
                             </div>
                             <textarea
@@ -491,12 +492,12 @@ export default function BuilderForm() {
                                 onChange={(e) => updateArrayItem("projects", i, "description", e.target.value)}
                                 rows={3}
                                 placeholder="What does this project do? (Write manually or use AI Generate)"
-                                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500 transition-all resize-none"
                             />
                         </div>
                     </div>
                 ))}
-                <button onClick={() => addItem("projects")} className="flex items-center gap-2 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer">
+                <button onClick={() => addItem("projects")} className="flex items-center gap-2 text-sm font-medium text-sky-500 hover:text-sky-600 transition-colors cursor-pointer">
                     <Plus className="h-4 w-4" /> Add Project
                 </button>
             </SectionCard>
@@ -517,7 +518,7 @@ export default function BuilderForm() {
                         </div>
                     </div>
                 ))}
-                <button onClick={() => addItem("certifications")} className="flex items-center gap-2 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer">
+                <button onClick={() => addItem("certifications")} className="flex items-center gap-2 text-sm font-medium text-sky-500 hover:text-sky-600 transition-colors cursor-pointer">
                     <Plus className="h-4 w-4" /> Add Certification
                 </button>
             </SectionCard>
@@ -527,7 +528,7 @@ export default function BuilderForm() {
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleGenerate}
-                className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-lg shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all cursor-pointer"
+                className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-sky-600 to-cyan-600 py-4 text-lg font-semibold text-white shadow-[0_12px_30px_rgba(3,105,161,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(3,105,161,0.45)]"
             >
                 <Sparkles className="h-5 w-5" />
                 Generate Resume
@@ -535,3 +536,4 @@ export default function BuilderForm() {
         </div>
     );
 }
+

@@ -50,9 +50,9 @@ export default function NotesPage() {
                 })) as Note[];
                 
                 setNotes(fetchedNotes);
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error('Error fetching notes:', err);
-                if (err.message && err.message.includes('requires an index')) {
+                if (err instanceof Error && err.message.includes('requires an index')) {
                     console.warn('Firestore index required: Please check your console browser logs for the link to create it.');
                 }
             } finally {
@@ -145,20 +145,20 @@ export default function NotesPage() {
 
     return (
         <ProtectedRoute>
-            <div className="container mx-auto px-4 py-8 max-w-6xl animate-fade-in">
+            <div className="mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8 page-enter">
                 <div className="mb-8 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="p-3 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                        <div className="rounded-2xl bg-emerald-100 p-3 text-emerald-700 shadow-sm">
                             <FileText className="w-6 h-6" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">AI Notes Saver</h1>
-                            <p className="text-gray-500 dark:text-gray-400">Capture and organize your thoughts.</p>
+                            <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">AI Notes Saver</h1>
+                            <p className="text-slate-600">Capture and organize your thoughts.</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 lg:gap-8">
                     {/* Saved Notes Section */}
                     <div className="space-y-4 lg:col-span-1 order-2 lg:order-1">
                         <div className="flex items-center justify-between">
@@ -181,13 +181,13 @@ export default function NotesPage() {
                                 </div>
                             ) : (
                                 notes.map((note) => (
-                                    <Card 
+                                    <Card
                                         key={note.id} 
                                         onClick={() => handleNoteClick(note)}
                                         className={`group transition-all cursor-pointer ${
                                             activeNoteId === note.id 
-                                                ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10' 
-                                                : 'hover:border-emerald-300 dark:hover:border-emerald-500/30'
+                                                ? 'border-emerald-400 bg-emerald-50/70 ring-1 ring-emerald-200'
+                                                : 'hover:border-emerald-300'
                                         }`}
                                     >
                                         <CardContent className="p-4 flex flex-col gap-2">
@@ -220,14 +220,14 @@ export default function NotesPage() {
 
                     {/* Editor Section */}
                     <div className="lg:col-span-3 space-y-4 order-1 lg:order-2">
-                        <Card className="border-emerald-100 dark:border-emerald-500/10 shadow-sm h-full flex flex-col transition-all">
+                        <Card className="h-full border-emerald-200/80 bg-white/85 shadow-sm flex flex-col transition-all">
                             <CardHeader className="pb-4">
                                 <CardTitle className="text-lg flex items-center gap-2">
                                     {activeNoteId ? 'Edit Note' : 'New Note'}
                                 </CardTitle>
                                 <CardDescription>Write down your ideas, summaries, or quick thoughts.</CardDescription>
                                 <Input 
-                                    className="mt-4 text-lg font-semibold bg-transparent border-0 border-b border-gray-100 dark:border-white/10 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-emerald-500" 
+                                    className="mt-4 text-lg font-semibold bg-transparent border-0 border-b border-slate-200 rounded-none px-0 py-2 shadow-none focus-visible:ring-0 focus-visible:border-emerald-500" 
                                     placeholder="Note Title" 
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
@@ -235,18 +235,18 @@ export default function NotesPage() {
                             </CardHeader>
                             <CardContent className="flex-1 pb-0">
                                 <Textarea
-                                    className="min-h-[400px] md:min-h-[500px] h-full resize-y border-0 bg-transparent px-0 py-2 focus-visible:ring-0 text-base shadow-none leading-relaxed"
+                                    className="min-h-[400px] md:min-h-[500px] h-full resize-y border-0 bg-transparent px-0 py-2 text-base shadow-none leading-relaxed focus-visible:ring-0"
                                     placeholder="Start typing your note here..."
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}
                                 />
                             </CardContent>
-                            <CardFooter className="flex justify-between items-center bg-gray-50 dark:bg-[#0A0A0B] py-4 border-t border-gray-100 dark:border-white/5 rounded-b-xl mt-auto">
-                                <span className="text-xs text-gray-400 font-medium">{wordCount} word{wordCount !== 1 ? 's' : ''}</span>
+                            <CardFooter className="mt-auto flex items-center justify-between rounded-b-xl border-t border-slate-200 bg-slate-50 py-4">
+                                <span className="text-xs font-medium text-slate-500">{wordCount} word{wordCount !== 1 ? 's' : ''}</span>
                                 <Button 
                                     onClick={handleSave} 
                                     disabled={saving || (!title.trim() && !content.trim())}
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 transition-all"
+                                    className="gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white"
                                 >
                                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                     {saving ? 'Saving...' : 'Save Note'}
