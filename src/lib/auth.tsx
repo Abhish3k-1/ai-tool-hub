@@ -1,7 +1,17 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut, User } from 'firebase/auth';
+import {
+    browserLocalPersistence,
+    getRedirectResult,
+    onAuthStateChanged,
+    setPersistence,
+    signInWithPopup,
+    signInWithRedirect,
+    signOut,
+    User,
+} from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 import { auth, provider } from '@/lib/firebase';
 
 interface AuthContextType {
@@ -21,29 +31,53 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
+        let mounted = true;
+
+        // Keep Firebase auth state across refreshes and recover redirect sign-ins.
+        const initAuth = async () => {
+            try {
+                await setPersistence(auth, browserLocalPersistence);
+            } catch (error) {
+                console.error('Failed to set auth persistence:', error);
+            }
+
+            try {
+                const redirectResult = await getRedirectResult(auth);
+                if (redirectResult?.user && mounted) {
+                    setUser(redirectResult.user);
+                    router.push('/dashboard');
+                }
+            } catch (error) {
+                console.error('Redirect sign-in error:', error);
+            }
+        };
+
+        void initAuth();
+
         const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+            if (!mounted) return;
             setUser(firebaseUser);
             setLoading(false);
         });
-        return () => unsubscribe();
-    }, []);
+
+        return () => {
+            mounted = false;
+            unsubscribe();
+        };
+    }, [router]);
 
     const signInWithGoogle = async () => {
         try {
-            const isLocalhost =
-                typeof window !== 'undefined' &&
-                (window.location.hostname === 'localhost' ||
-                    window.location.hostname === '127.0.0.1');
+            const result = await signInWithPopup(auth, provider);
+            const signedInUser = result.user;
 
-            // Redirect flow is more reliable on deployed domains (Vercel, custom domains).
-            if (!isLocalhost) {
-                await signInWithRedirect(auth, provider);
-                return;
+            if (signedInUser) {
+                setUser(signedInUser);
+                router.push('/dashboard');
             }
-
-            await signInWithPopup(auth, provider);
         } catch (error: unknown) {
             const err = error as { code?: string; message?: string };
             const code = err.code ?? 'unknown';
