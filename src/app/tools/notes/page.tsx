@@ -307,7 +307,7 @@ export default function NotesPage() {
                                         
                                         <div className="flex justify-between items-start gap-2 pl-1">
                                             <h4 className="font-semibold text-slate-800 line-clamp-1 text-sm pt-0.5">{note.title || 'Untitled'}</h4>
-                                            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 rounded backdrop-blur border border-slate-100 shadow-sm p-0.5">
+                                            <div className="flex items-center opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 rounded backdrop-blur border border-slate-100 shadow-sm p-0.5">
                                                 <button 
                                                     onClick={(e) => toggleFavorite(note.id, !!note.isFavorite, e)}
                                                     className={`p-1 rounded text-slate-400 hover:bg-slate-100 transition-colors ${note.isFavorite ? 'text-amber-400' : ''}`}

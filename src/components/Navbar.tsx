@@ -9,7 +9,7 @@ import AuthButton from "@/components/AuthButton";
 
 export default function Navbar() {
     const [mobileOpen, setMobileOpen] = useState(false);
-    const { user } = useAuth();
+    const { user, role } = useAuth();
     const pathname = usePathname();
 
     const isLandingPage = pathname === "/";
@@ -30,12 +30,22 @@ export default function Navbar() {
                 {/* Desktop */}
                 <div className="hidden md:flex items-center gap-2 rounded-2xl border border-slate-200/70 bg-white/85 p-1.5 shadow-sm">
                     {user && !isLandingPage && (
-                        <Link
-                            href="/dashboard"
-                            className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-sky-50 hover:text-slate-900"
-                        >
-                            Dashboard
-                        </Link>
+                        <>
+                            <Link
+                                href="/dashboard"
+                                className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-sky-50 hover:text-slate-900"
+                            >
+                                Dashboard
+                            </Link>
+                            {role === 'admin' && (
+                                <Link
+                                    href="/admin"
+                                    className="rounded-xl px-4 py-2 text-sm font-semibold text-purple-600 transition-all hover:bg-purple-50 hover:text-purple-700"
+                                >
+                                    Admin
+                                </Link>
+                            )}
+                        </>
                     )}
                     <AuthButton />
                 </div>
@@ -58,13 +68,24 @@ export default function Navbar() {
                 <div className="md:hidden border-t border-sky-100/80 bg-white/95 backdrop-blur-xl page-enter">
                     <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-2 px-4 py-4 sm:px-6">
                         {user && !isLandingPage && (
-                            <Link
-                                href="/dashboard"
-                                className="rounded-xl border border-sky-100 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-sky-200 hover:bg-sky-50/70"
-                                onClick={() => setMobileOpen(false)}
-                            >
-                                Dashboard
-                            </Link>
+                            <>
+                                <Link
+                                    href="/dashboard"
+                                    className="rounded-xl border border-sky-100 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-sky-200 hover:bg-sky-50/70"
+                                    onClick={() => setMobileOpen(false)}
+                                >
+                                    Dashboard
+                                </Link>
+                                {role === 'admin' && (
+                                    <Link
+                                        href="/admin"
+                                        className="rounded-xl border border-purple-100 bg-white px-4 py-3 text-sm font-semibold text-purple-700 shadow-sm transition-all hover:border-purple-200 hover:bg-purple-50/70"
+                                        onClick={() => setMobileOpen(false)}
+                                    >
+                                        Admin
+                                    </Link>
+                                )}
+                            </>
                         )}
                         <div className="pt-2 border-t border-sky-100/80">
                             <AuthButton />
