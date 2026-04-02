@@ -10,8 +10,7 @@ const productLinks = [
 const toolLinks = [
     { label: "Notes Saver", href: "/tools/notes" },
     { label: "YouTube Summarizer", href: "/tools/youtube" },
-    { label: "AI Job Search", href: "/tools/job-search" },
-    { label: "AI Resume Maker", href: "/tools/resume" },
+    { label: "AI Research", href: "/tools/ai-research" },
 ];
 
 const contactLinks = [
@@ -35,7 +34,7 @@ export default function Footer() {
                             </span>
                         </div>
                         <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                            A modern AI workspace for summaries, notes, jobs, and resumes.
+                            A modern AI workspace for summaries, web research, and notes.
                         </p>
                     </div>
 

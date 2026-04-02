@@ -5,13 +5,20 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Youtube, Wand2, Play, Loader2 } from 'lucide-react';
+import { Youtube, Wand2, Play, Loader2, Save, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { useAuth } from '@/lib/auth';
+import { trackUsage, saveAsNote } from '@/services/usage';
+import { useToast } from '@/components/Toast';
 
 export default function YoutubeSummarizerPage() {
+    const { user } = useAuth();
+    const { showToast } = useToast();
     const [url, setUrl] = useState('');
     const [summary, setSummary] = useState('');
     const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
     const [error, setError] = useState('');
 
     const handleSummarize = async () => {
@@ -38,11 +45,36 @@ export default function YoutubeSummarizerPage() {
             }
 
             setSummary(data.summary);
+            
+            // Track usage for Admin Dashboard
+            trackUsage('youtube', user?.email);
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : 'Something went wrong';
             setError(message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSaveToNotes = async () => {
+        if (!user?.email || !summary) return;
+
+        setSaving(true);
+        try {
+            const title = `YouTube Summary: ${url.split('v=')[1]?.split('&')[0] || 'Video'}`;
+            const result = await saveAsNote(user.email, title, summary);
+            
+            if (result.success) {
+                setSaved(true);
+                showToast('Summary saved to your notes!', 'success');
+            } else {
+                showToast('Failed to save summary.', 'error');
+            }
+        } catch (err) {
+            console.error('Save to notes error:', err);
+            showToast('An error occurred while saving.', 'error');
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -139,14 +171,28 @@ export default function YoutubeSummarizerPage() {
                                 <CardContent className="p-0">
                                     <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-6 py-4">
                                         <div className="flex items-center gap-2">
-                                            <Wand2 className="w-4 h-4 text-sky-600" />
-                                            <span className="text-sm font-semibold text-slate-900">AI Generated Summary</span>
+                                            <Button 
+                                                variant="outline" 
+                                                size="sm" 
+                                                className="h-8 text-xs font-medium cursor-pointer gap-1.5 border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+                                                onClick={handleSaveToNotes}
+                                                disabled={saving || saved}
+                                            >
+                                                {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : (saved ? <Check className="w-3 h-3 text-emerald-500" /> : <Save className="w-3 h-3" />)}
+                                                {saved ? 'Saved to Notes' : 'Save as Note'}
+                                            </Button>
+                                            <span className="text-xs text-slate-400">|</span>
+                                            <Wand2 className="w-4 h-4 text-sky-600 ml-1" />
+                                            <span className="text-sm font-semibold text-slate-900">AI Summary</span>
                                         </div>
                                         <Button 
-                                            variant="outline" 
+                                            variant="ghost" 
                                             size="sm" 
                                             className="h-8 text-xs font-medium cursor-pointer"
-                                            onClick={() => navigator.clipboard.writeText(summary)}
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(summary);
+                                                showToast('Copied to clipboard!', 'success');
+                                            }}
                                         >
                                             Copy to Clipboard
                                         </Button>

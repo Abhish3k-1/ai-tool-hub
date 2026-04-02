@@ -3,16 +3,13 @@
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ToolCard from '@/components/ToolCard';
 import { useAuth } from '@/lib/auth';
-import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import {
     ArrowUpRight,
-    Briefcase,
+    Search,
     Clock3,
     FileText,
-    FileType,
-    FolderOpen,
+    Globe,
     ShieldCheck,
     Sparkles,
     Youtube,
@@ -22,54 +19,12 @@ import {
 export default function DashboardPage() {
     const { user } = useAuth();
     const firstName = user?.displayName?.split(' ')[0] || 'Builder';
-    const [hasGeneratedResume, setHasGeneratedResume] = useState(false);
-
-    useEffect(() => {
-        let isMounted = true;
-
-        const fetchResumeStatus = async () => {
-            if (!user?.uid) {
-                if (isMounted) setHasGeneratedResume(false);
-                return;
-            }
-
-            try {
-                const supabase = createClient();
-                const { data, error } = await supabase
-                    .from('resume')
-                    .select('id')
-                    .eq('user_id', user.uid)
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
-
-                if (!isMounted) return;
-
-                if (error) {
-                    console.error('Failed to check resume status:', error);
-                    setHasGeneratedResume(false);
-                    return;
-                }
-
-                setHasGeneratedResume(!!data);
-            } catch (error) {
-                console.error('Failed to check resume status:', error);
-                if (isMounted) setHasGeneratedResume(false);
-            }
-        };
-
-        fetchResumeStatus();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [user?.uid]);
 
     const overviewStats = [
         {
-            value: '4',
+            value: '3',
             label: 'Active Tools',
-            helper: 'Notes, YouTube, Job Search, Resume',
+            helper: 'Notes, YouTube, AI Research',
             icon: Sparkles,
             accent: 'from-sky-500 to-cyan-500',
         },
@@ -99,8 +54,7 @@ export default function DashboardPage() {
     const quickActions = [
         { href: '/tools/notes', label: 'Open Notes Saver', icon: FileText },
         { href: '/tools/youtube', label: 'Summarize a Video', icon: Youtube },
-        { href: '/tools/job-search', label: 'Find New Jobs', icon: Briefcase },
-        { href: '/tools/resume', label: 'Build a Resume', icon: FileType },
+        { href: '/tools/ai-research', label: 'Start Research', icon: Search },
     ];
 
     return (
@@ -129,10 +83,10 @@ export default function DashboardPage() {
 
                             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                                 <Link
-                                    href="/tools/resume"
+                                    href="/tools/ai-research"
                                     className="cursor-glow-btn inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-600 to-cyan-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_28px_rgba(3,105,161,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_32px_rgba(3,105,161,0.44)]"
                                 >
-                                    Build Resume
+                                    Start Research
                                     <ArrowUpRight className="h-4 w-4" />
                                 </Link>
                                 <Link
@@ -141,13 +95,6 @@ export default function DashboardPage() {
                                 >
                                     Open Notes
                                     <ArrowUpRight className="h-4 w-4" />
-                                </Link>
-                                <Link
-                                    href="/tools/resume/my-resume"
-                                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:bg-sky-50/70"
-                                >
-                                    <FolderOpen className="h-4 w-4" />
-                                    {hasGeneratedResume ? 'My Resume' : 'No Resume Generated'}
                                 </Link>
                             </div>
                         </div>
@@ -221,18 +168,11 @@ export default function DashboardPage() {
                             colorClass="text-rose-600 bg-rose-50"
                         />
                         <ToolCard
-                            title="AI Job Search"
-                            description="Find the perfect role matching your skills with deep employment insights."
-                            href="/tools/job-search"
-                            icon={Briefcase}
+                            title="AI Research"
+                            description="Deeply analyze any topic with Firecrawl's real-time web awareness."
+                            href="/tools/ai-research"
+                            icon={Globe}
                             colorClass="text-sky-600 bg-sky-50"
-                        />
-                        <ToolCard
-                            title="AI Resume Maker"
-                            description="Craft a professional, ATS-friendly resume tailored to job descriptions."
-                            href="/tools/resume"
-                            icon={FileType}
-                            colorClass="text-cyan-600 bg-cyan-50"
                         />
                     </div>
                 </section>

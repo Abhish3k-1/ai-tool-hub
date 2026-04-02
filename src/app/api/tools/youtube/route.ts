@@ -1,19 +1,18 @@
 import { NextResponse } from 'next/server';
 import { YoutubeTranscript } from 'youtube-transcript';
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-// Free-tier models rotated in order.
-const FREE_MODELS = [
-    'google/gemma-3-27b-it:free',
-    'qwen/qwen3-next-80b-a3b-instruct:free',
-    'nvidia/nemotron-3-nano-30b-a3b:free',
-    'meta-llama/llama-3.2-3b-instruct:free',
+// Groq models
+const MODELS = [
+    'llama-3.3-70b-versatile',
+    'mixtral-8x7b-32768',
+    'llama-3.1-8b-instant',
 ];
 
-const MAX_RETRY_ROUNDS = 3;
-const RETRY_DELAY_MS = 2000;
-const MAX_TRANSCRIPT_WORDS = 4000;
+const MAX_RETRY_ROUNDS = 2;
+const RETRY_DELAY_MS = 1500;
+const MAX_TRANSCRIPT_WORDS = 5000;
 
 type SourceMode = 'transcript' | 'metadata' | 'minimal';
 
@@ -59,15 +58,14 @@ function uniqueWordRatio(text: string) {
 function isLowQualitySummary(summary: string) {
     const normalized = normalizeText(summary);
     if (!normalized) return true;
-    if (normalized.length < 180) return true;
-    if (uniqueWordRatio(normalized) < 0.18) return true;
+    if (normalized.length < 150) return true;
+    if (uniqueWordRatio(normalized) < 0.15) return true;
 
     const badPatterns = [
         /as an ai language model/i,
         /i cannot access/i,
         /unable to summarize/i,
         /no transcript available/i,
-        /lorem ipsum/i,
     ];
 
     return badPatterns.some((pattern) => pattern.test(normalized));
@@ -88,7 +86,7 @@ function splitIntoSentences(text: string) {
     return normalized
         .split('|')
         .map((s) => s.trim())
-        .filter((s) => s.length > 35);
+        .filter((s) => s.length > 30);
 }
 
 function extractEnglishTerms(text: string, maxTerms = 10) {
@@ -179,7 +177,7 @@ function buildDeterministicSummary(params: {
             : [
                 '- A precise transcript was not available in this run.',
                 '- This fallback focuses on stable context so you still receive a usable summary output.',
-                '- For higher fidelity, try a video with captions enabled and rerun once traffic drops.',
+                '- For higher fidelity, try a video with captions enabled and rerun.',
             ];
 
     const overview =
@@ -215,14 +213,12 @@ function buildDeterministicSummary(params: {
         .join('\n');
 }
 
-async function callOpenRouter(modelName: string, systemPrompt: string, userPrompt: string) {
-    return fetch('https://openrouter.ai/api/v1/chat/completions', {
+async function callGroq(modelName: string, systemPrompt: string, userPrompt: string) {
+    return fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+            Authorization: `Bearer ${GROQ_API_KEY}`,
             'Content-Type': 'application/json',
-            'HTTP-Referer': 'http://localhost:3000',
-            'X-Title': 'AI Tools Hub',
         },
         body: JSON.stringify({
             model: modelName,
@@ -231,6 +227,7 @@ async function callOpenRouter(modelName: string, systemPrompt: string, userPromp
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: userPrompt },
             ],
+            max_tokens: 1024,
         }),
     });
 }
@@ -365,25 +362,25 @@ export async function POST(req: Request) {
                     ? `Metadata text:\n${transcriptText}\n\nVideo URL: ${canonicalVideoUrl}`
                     : `Minimal context:\n${transcriptText}\n\nVideo URL: ${canonicalVideoUrl}`;
 
-        if (!OPENROUTER_API_KEY) {
+        if (!GROQ_API_KEY) {
             const summary = buildDeterministicSummary({
                 sourceText: transcriptText,
                 sourceMode,
                 videoUrl: canonicalVideoUrl,
                 segments: transcriptSegments,
                 metadata,
-                reason: 'OpenRouter key missing - local fallback used.',
+                reason: 'Groq API key missing - local fallback used.',
             });
             return NextResponse.json({ summary });
         }
 
         let lastError = '';
         for (let round = 1; round <= MAX_RETRY_ROUNDS; round++) {
-            console.log(`[YouTube Summarizer] Retry round ${round}/${MAX_RETRY_ROUNDS}`);
-            for (const model of FREE_MODELS) {
-                console.log('[YouTube Summarizer] Trying model:', model);
+            console.log(`[YouTube Summarizer] Round ${round}/${MAX_RETRY_ROUNDS}`);
+            for (const model of MODELS) {
+                console.log('[YouTube Summarizer] Requesting model:', model);
                 try {
-                    const response = await callOpenRouter(model, systemPrompt, userPrompt);
+                    const response = await callGroq(model, systemPrompt, userPrompt);
 
                     if (response.ok) {
                         const data = (await response.json()) as {
@@ -394,23 +391,21 @@ export async function POST(req: Request) {
                         if (!summary) {
                             lastError = `Empty response on ${model}`;
                         } else if (!isLikelyEnglish(summary)) {
-                            console.log('[YouTube Summarizer] Non-English output, switching model');
                             lastError = `Non-English output on ${model}`;
                         } else if (isLowQualitySummary(summary)) {
-                            console.log('[YouTube Summarizer] Low-quality output, switching model');
                             lastError = `Low-quality output on ${model}`;
                         } else {
                             return NextResponse.json({ summary });
                         }
                     } else if (response.status === 429) {
-                        console.log('[YouTube Summarizer] Rate limited, switching model');
+                        console.log('[YouTube Summarizer] Rate limited on Groq, switching model');
                         lastError = `429 rate limited on ${model}`;
                     } else {
                         const errorText = await response.text();
                         lastError = `${response.status} ${response.statusText} on ${model}: ${errorText.slice(0, 160)}`;
                     }
                 } catch (err: unknown) {
-                    lastError = err instanceof Error ? err.message : 'Unknown model call error';
+                    lastError = err instanceof Error ? err.message : 'Unknown Groq call error';
                 }
 
                 await delay(RETRY_DELAY_MS);
@@ -423,13 +418,13 @@ export async function POST(req: Request) {
             videoUrl: canonicalVideoUrl,
             segments: transcriptSegments,
             metadata,
-            reason: `All AI models were busy or unusable (${lastError || 'unknown error'})`,
+            reason: `AI models unavailable (${lastError || 'exhausted retries'})`,
         });
 
         return NextResponse.json({ summary });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Internal server error';
-        console.error('[YouTube Summarizer] Unexpected error:', message);
+        console.error('[YouTube Summarizer] Global error:', message);
         return NextResponse.json({ error: message }, { status: 500 });
     }
 }

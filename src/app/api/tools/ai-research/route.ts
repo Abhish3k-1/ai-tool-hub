@@ -15,7 +15,6 @@ export async function POST(req: Request) {
         }
 
         // Use the REST API of Firecrawl directly to search the web
-        // Asking it to look for job boards
         const searchResponse = await fetch('https://api.firecrawl.dev/v1/search', {
             method: 'POST',
             headers: {
@@ -30,32 +29,32 @@ export async function POST(req: Request) {
 
         if (!searchResponse.ok) {
             const errorText = await searchResponse.text();
-            console.error('[Job Search] Firecrawl Error:', searchResponse.status, errorText);
+            console.error('[AI Research] Firecrawl Error:', searchResponse.status, errorText);
             
             if (searchResponse.status === 402 || searchResponse.status === 403 || errorText.includes('credit')) {
                 return NextResponse.json({ error: 'Firecrawl API credit limit reached or unauthorized.' }, { status: searchResponse.status });
             }
             
-            return NextResponse.json({ error: `Failed to fetch jobs connected to Firecrawl (${searchResponse.status})` }, { status: searchResponse.status });
+            return NextResponse.json({ error: `Failed to fetch results via Firecrawl (${searchResponse.status})` }, { status: searchResponse.status });
         }
 
         const data = await searchResponse.json();
 
         if (!data.success || !data.data || data.data.length === 0) {
-            return NextResponse.json({ jobs: [] }); // No jobs found
+            return NextResponse.json({ results: [] }); // No insights found
         }
 
         // Map Firecrawl results into our expected schema
-        const jobs = data.data.map((result: any) => ({
-            title: result.title || 'Unknown Position',
+        const results = data.data.map((result: any) => ({
+            title: result.title || 'Untitled Source',
             url: result.url || '#',
             description: result.description || 'No description provided.',
         }));
 
-        return NextResponse.json({ jobs });
+        return NextResponse.json({ results });
 
     } catch (error: any) {
-        console.error('[Job Search] Unexpected error:', error);
+        console.error('[AI Research] Unexpected error:', error);
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }

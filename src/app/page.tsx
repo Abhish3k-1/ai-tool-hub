@@ -3,11 +3,10 @@
 import { useAuth } from '@/lib/auth';
 import {
     ArrowRight,
-    Briefcase,
+    Globe,
     FileText,
-    FileType,
     Sparkles,
-    Wand2,
+    Search,
     Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,28 +27,20 @@ export default function Home() {
             tag: 'Firestore',
         },
         {
-            icon: Wand2,
+            icon: Zap,
             title: 'YouTube Summarizer',
             desc: 'Turn long videos into crisp highlights in seconds with AI-powered summaries.',
             color: 'from-rose-400 to-red-500',
             href: '/tools/youtube',
-            tag: 'OpenRouter',
+            tag: 'Groq AI',
         },
         {
-            icon: Briefcase,
-            title: 'AI Job Search',
-            desc: 'Discover relevant roles quickly with intelligent job matching and filters.',
+            icon: Globe,
+            title: 'AI Research',
+            desc: 'Deeply analyze any topic with Firecrawl\'s real-time web awareness.',
             color: 'from-sky-400 to-blue-500',
-            href: '/tools/job-search',
+            href: '/tools/ai-research',
             tag: 'Firecrawl',
-        },
-        {
-            icon: FileType,
-            title: 'AI Resume Maker',
-            desc: 'Build ATS-ready resumes with a polished workflow and one-click export.',
-            color: 'from-sky-500 to-cyan-500',
-            href: '/tools/resume',
-            tag: 'Supabase',
         },
     ];
 
@@ -93,7 +84,7 @@ export default function Home() {
                         </h1>
 
                         <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg lg:text-[1.05rem]">
-                            A polished workspace for summaries, job discovery, notes, and resume building with fast performance and focused UX.
+                            A polished workspace for summaries, web research, and notes with fast performance and focused UX for builders.
                         </p>
 
                         <div className="mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row lg:justify-start">
@@ -166,11 +157,11 @@ export default function Home() {
 
                     <div className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">
                         <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                        4 Modules Live
+                        3 Modules Live
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                     {tools.map((feature) => (
                         <Link
                             key={feature.title}
@@ -213,7 +204,7 @@ export default function Home() {
                     },
                     {
                         title: 'Select Tool',
-                        desc: 'Jump into summaries, jobs, notes, or resume generation.',
+                        desc: 'Jump into summaries, research insights, or notes saving.',
                         step: '02',
                     },
                     {
@@ -254,7 +245,7 @@ export default function Home() {
 
                         <div className="grid grid-cols-2 gap-3">
                             <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 text-center">
-                                <p className="text-2xl font-black text-slate-900">4</p>
+                                <p className="text-2xl font-black text-slate-900">3</p>
                                 <p className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Core Tools</p>
                             </div>
                             <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 text-center">
