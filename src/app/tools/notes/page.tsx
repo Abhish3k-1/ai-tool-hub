@@ -361,8 +361,16 @@ export default function NotesPage() {
                                             {saveStatus === 'saving' && <><Loader2 className="w-3 h-3 animate-spin text-amber-500" /> <span className="text-amber-600">Saving</span></>}
                                             {saveStatus === 'saved' && <><Save className="w-3 h-3 text-emerald-500" /> <span className="text-emerald-600">Saved</span></>}
                                             {saveStatus === 'error' && <span className="text-red-500">Error saving</span>}
-                                            {saveStatus === 'idle' && <span className="text-slate-400 opacity-50">Synced to cloud</span>}
+                                            {saveStatus === 'idle' && <span className="text-slate-400 opacity-50 hidden sm:inline-block">Synced to cloud</span>}
                                         </div>
+                                        <Button 
+                                            variant="outline" 
+                                            size="sm" 
+                                            onClick={handleManualSave}
+                                            className="h-8 px-3 text-xs gap-1.5 rounded-md bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition-colors shadow-sm"
+                                        >
+                                            <Save className="w-3.5 h-3.5" /> Save
+                                        </Button>
                                     </div>
                                 </div>
 
