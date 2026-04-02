@@ -16,11 +16,15 @@ const baseLinks = [
 export default function Header() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const pathname = usePathname();
-    const { user } = useAuth();
+    const { user, role } = useAuth();
 
-    const navLinks = user
-        ? [...baseLinks, { href: "/dashboard", label: "Dashboard" }]
-        : baseLinks;
+    let navLinks = baseLinks;
+    if (user) {
+        navLinks = [...navLinks, { href: "/dashboard", label: "Dashboard" }];
+        if (role === 'admin') {
+            navLinks = [...navLinks, { href: "/admin", label: "Admin" }];
+        }
+    }
 
     return (
         <header className="sticky top-0 z-50 border-b border-sky-100/80 bg-white/75 backdrop-blur-xl">
@@ -37,6 +41,7 @@ export default function Header() {
                 <nav className="hidden items-center gap-1 rounded-2xl border border-sky-100/80 bg-white/90 p-1.5 shadow-sm md:flex">
                     {navLinks.map((link) => {
                         const isActive = pathname === link.href || (link.href === "/" && pathname === "/");
+                        const isAdmin = link.href === "/admin";
 
                         return (
                             <Link
@@ -45,8 +50,8 @@ export default function Header() {
                                 className={cn(
                                     "rounded-xl px-4 py-2 text-sm font-semibold transition-all",
                                     isActive
-                                        ? "bg-sky-100/80 text-slate-900"
-                                        : "text-slate-600 hover:bg-sky-50 hover:text-slate-900"
+                                        ? (isAdmin ? "bg-purple-100/80 text-purple-900" : "bg-sky-100/80 text-slate-900")
+                                        : (isAdmin ? "text-purple-600 hover:bg-purple-50 hover:text-purple-900" : "text-slate-600 hover:bg-sky-50 hover:text-slate-900")
                                 )}
                             >
                                 {link.label}
@@ -71,16 +76,24 @@ export default function Header() {
             {mobileOpen && (
                 <div className="page-enter border-t border-sky-100/80 bg-white/95 backdrop-blur-xl md:hidden">
                     <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-2 px-4 py-4 sm:px-6">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className="rounded-xl border border-sky-100 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-sky-200 hover:bg-sky-50/70"
-                                onClick={() => setMobileOpen(false)}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
+                        {navLinks.map((link) => {
+                            const isAdmin = link.href === "/admin";
+                            return (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    className={cn(
+                                        "rounded-xl border px-4 py-3 text-sm font-semibold shadow-sm transition-all",
+                                        isAdmin
+                                            ? "border-purple-100 bg-white text-purple-700 hover:border-purple-200 hover:bg-purple-50/70"
+                                            : "border-sky-100 bg-white text-slate-700 hover:border-sky-200 hover:bg-sky-50/70"
+                                    )}
+                                    onClick={() => setMobileOpen(false)}
+                                >
+                                    {link.label}
+                                </Link>
+                            );
+                        })}
                         <div className="border-t border-sky-100/80 pt-2">
                             <AuthButton />
                         </div>

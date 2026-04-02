@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@mendable/firecrawl-js": "^4.16.0",
-    "@supabase/ssr": "^0.9.0",
-    "@supabase/supabase-js": "^2.99.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tiptap/extension-character-count": "^3.22.1",
     "@tiptap/extension-highlight": "^3.22.1",
