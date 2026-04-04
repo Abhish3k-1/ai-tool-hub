@@ -15,16 +15,16 @@ export default function ToolCard({
     description,
     href,
     icon: Icon,
-    colorClass = 'text-blue-500 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30',
+    colorClass = 'text-blue-500 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20',
 }: ToolCardProps) {
     return (
         <Link href={href} className="group block h-full">
-            <div className="hover-lift interactive-ripple relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200/70 bg-white/82 p-6 shadow-[0_10px_24px_rgba(15,23,42,0.07)] backdrop-blur-xl dark:border-slate-800/70 dark:bg-slate-900/82 dark:shadow-[0_15px_30px_rgba(0,0,0,0.3)]">
+            <div className="hover-lift interactive-ripple relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200/70 bg-white/82 p-6 shadow-[0_10px_24px_rgba(15,23,42,0.07)] backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/60 dark:shadow-[0_15px_30px_rgba(0,0,0,0.4)]">
                 <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/45 via-sky-50/30 to-cyan-50/25 dark:from-slate-800/45 dark:via-slate-800/30 dark:to-slate-900/25" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/45 via-sky-50/30 to-cyan-50/25 dark:from-slate-800/30 dark:via-slate-800/20 dark:to-slate-900/15" />
                 </div>
 
-                <div className={cn('relative mb-6 flex h-12 w-12 items-center justify-center rounded-2xl shadow-sm ring-1 ring-white/80 transition-transform duration-200 group-hover:scale-110 dark:ring-slate-700/50', colorClass)}>
+                <div className={cn('relative mb-6 flex h-12 w-12 items-center justify-center rounded-2xl shadow-sm ring-1 ring-white/80 transition-transform duration-200 group-hover:scale-110 dark:ring-slate-700/30', colorClass)}>
                     <Icon className="h-6 w-6" />
                 </div>
 
@@ -40,7 +40,7 @@ export default function ToolCard({
                     Open Tool <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
 
-                <div className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-sky-500 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100 dark:via-sky-400" />
+                <div className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-sky-500 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100 dark:via-sky-500/50" />
             </div>
         </Link>
     );

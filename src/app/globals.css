@@ -89,42 +89,42 @@
 }
 
 .dark {
-  --background: #0b1220;
-  --foreground: #eaf6ff;
-  --card: #0f1b2e;
-  --card-foreground: #eaf6ff;
-  --popover: #0f1b2e;
-  --popover-foreground: #eaf6ff;
+  --background: #060912;
+  --foreground: #d1dae5;
+  --card: #0a0f1d;
+  --card-foreground: #d1dae5;
+  --popover: #0a0f1d;
+  --popover-foreground: #d1dae5;
   --primary: #38bdf8;
   --primary-foreground: #082032;
-  --secondary: #13243a;
-  --secondary-foreground: #eaf6ff;
-  --muted: #13243a;
-  --muted-foreground: #9fb9cf;
+  --secondary: #0f172a;
+  --secondary-foreground: #d1dae5;
+  --muted: #0f172a;
+  --muted-foreground: #64748b;
   --accent: #1e293b;
-  --accent-foreground: #eaf6ff;
+  --accent-foreground: #d1dae5;
   --destructive: #7f1d1d;
-  --border: #2b3f59;
-  --input: #2b3f59;
-  --ring: #6fa4ce;
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #38bdf8;
   --chart-1: #38bdf8;
   --chart-2: #0ea5e9;
   --chart-3: #0284c7;
   --chart-4: #1d4ed8;
   --chart-5: #4338ca;
-  --sidebar: #0f1b2e;
-  --sidebar-foreground: #eaf6ff;
+  --sidebar: #0a0f1d;
+  --sidebar-foreground: #d1dae5;
   --sidebar-primary: #38bdf8;
   --sidebar-primary-foreground: #082032;
-  --sidebar-accent: #13243a;
-  --sidebar-accent-foreground: #eaf6ff;
-  --sidebar-border: #2b3f59;
-  --sidebar-ring: #6fa4ce;
-  --surface-1: rgba(15, 27, 46, 0.82);
-  --surface-2: rgba(15, 27, 46, 0.64);
-  --glow-sky: rgba(56, 189, 248, 0.15);
-  --glow-cyan: rgba(14, 165, 233, 0.15);
-  --bg-gradient: linear-gradient(180deg, #0b1220 0%, #0f1b2e 42%, #0b1220 100%);
+  --sidebar-accent: #0f172a;
+  --sidebar-accent-foreground: #d1dae5;
+  --sidebar-border: #1e293b;
+  --sidebar-ring: #38bdf8;
+  --surface-1: rgba(10, 15, 29, 0.75);
+  --surface-2: rgba(10, 15, 29, 0.5);
+  --glow-sky: rgba(56, 189, 248, 0.1);
+  --glow-cyan: rgba(14, 165, 233, 0.1);
+  --bg-gradient: linear-gradient(180deg, #060912 0%, #0a0f1d 42%, #060912 100%);
 }
 
 /* Isolated Resume Preview Styling */

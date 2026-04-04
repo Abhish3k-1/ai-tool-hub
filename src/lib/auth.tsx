@@ -39,6 +39,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         let mounted = true;
+        let redirectChecked = false;
+        let authStateFetched = false;
+
+        const checkComplete = () => {
+            if (mounted && redirectChecked && authStateFetched) {
+                setLoading(false);
+            }
+        };
 
         // Keep Firebase auth state across refreshes and recover redirect sign-ins.
         const initAuth = async () => {
@@ -70,9 +78,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 }
             } catch (error: any) {
                 console.error('Redirect sign-in error:', error);
-                if (error.code === 'auth/credential-already-in-use') {
-                    // Handle case where account is already linked or in use
-                }
+            } finally {
+                redirectChecked = true;
+                checkComplete();
             }
         };
 
@@ -98,8 +106,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 setRole(null);
             }
             
-            // Ensure we set loading to false only after initial check
-            setLoading(false);
+            authStateFetched = true;
+            checkComplete();
         });
 
         return () => {

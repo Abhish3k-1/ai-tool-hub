@@ -28,7 +28,7 @@ export default function Header() {
     }
 
     return (
-        <header className="sticky top-0 z-50 border-b border-sky-100/80 bg-white/75 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/75">
+        <header className="sticky top-0 z-50 border-b border-sky-100/80 bg-white/75 backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-950/75">
             <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
                 <Link href="/" className="group flex items-center gap-2">
                     <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-500 shadow-[0_10px_28px_rgba(3,105,161,0.28)] transition-all duration-200 group-hover:scale-[1.04] group-hover:shadow-[0_14px_32px_rgba(3,105,161,0.36)] dark:from-sky-600 dark:to-cyan-600">
@@ -39,7 +39,7 @@ export default function Header() {
                     </span>
                 </Link>
 
-                <nav className="hidden items-center gap-1 rounded-2xl border border-sky-100/80 bg-white/90 p-1.5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/90 md:flex">
+                <nav className="hidden items-center gap-1 rounded-2xl border border-sky-100/80 bg-white/90 p-1.5 shadow-sm dark:border-slate-800/50 dark:bg-slate-900/80 md:flex">
                     {navLinks.map((link) => {
                         const isActive = pathname === link.href || (link.href === "/" && pathname === "/");
                         const isAdmin = link.href === "/admin";
@@ -78,7 +78,7 @@ export default function Header() {
             </div>
 
             {mobileOpen && (
-                <div className="page-enter border-t border-sky-100/80 bg-white/95 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/95 md:hidden">
+                <div className="page-enter border-t border-sky-100/80 bg-white/95 backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-950/95 md:hidden">
                     <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-2 px-4 py-4 sm:px-6">
                         {navLinks.map((link) => {
                             const isAdmin = link.href === "/admin";

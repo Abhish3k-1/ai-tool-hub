@@ -101,7 +101,7 @@ export default function Sidebar() {
                 </div>
             </aside>
 
-            <nav className="fixed inset-x-0 bottom-3 z-40 mx-auto w-[calc(100%-1rem)] max-w-md rounded-2xl border border-sky-100/80 bg-white/90 p-2 shadow-[0_12px_28px_rgba(8,47,73,0.14)] backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/90 md:hidden">
+            <nav className="fixed inset-x-0 bottom-3 z-40 mx-auto w-[calc(100%-1rem)] max-w-md rounded-2xl border border-sky-100/80 bg-white/90 p-2 shadow-[0_12px_28px_rgba(8,47,73,0.14)] backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-950/90 md:hidden">
                 <div className="grid gap-1 grid-cols-4">
                     {menuItems.map((item) => {
                         const isActive = pathname === item.href;

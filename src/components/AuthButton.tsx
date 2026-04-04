@@ -37,7 +37,7 @@ export default function AuthButton() {
 
     return user ? (
         <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden items-center gap-2 rounded-xl border border-slate-200/70 bg-white/90 px-2 py-1.5 dark:border-slate-800/70 dark:bg-slate-900/90 sm:flex">
+            <div className="hidden items-center gap-2 rounded-xl border border-slate-200/70 bg-white/90 px-2 py-1.5 dark:border-slate-800/50 dark:bg-slate-900/60 sm:flex">
                 {user.photoURL ? (
                     <img src={user.photoURL} alt="Avatar" className="h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 object-cover" />
                 ) : (
