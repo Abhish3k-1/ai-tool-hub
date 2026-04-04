@@ -16,7 +16,6 @@ import {
     Heading1, 
     Heading2, 
     Quote,
-    Highlighter,
     Sparkles
 } from 'lucide-react';
 import React, { useEffect, useCallback } from 'react';

@@ -3,7 +3,6 @@
 @import "shadcn/tailwind.css";
 @plugin "@tailwindcss/typography";
 
-@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
@@ -85,9 +84,8 @@
   --surface-2: rgba(255, 255, 255, 0.64);
   --glow-sky: rgba(37, 99, 235, 0.2);
   --glow-cyan: rgba(14, 165, 233, 0.22);
+  --bg-gradient: linear-gradient(180deg, #f5fbff 0%, #ecf7ff 42%, #f5fbff 100%);
 }
-
-
 
 /* Isolated Resume Preview Styling */
 .resume-preview-container {
@@ -109,9 +107,9 @@ body {
     @apply bg-background text-foreground;
     background-image:
       radial-gradient(84rem 44rem at 12% -8%, var(--glow-sky), transparent 56%),
-      radial-gradient(78rem 38rem at 100% -4%, var(--glow-cyan), transparent 54%),
+      radial-gradient(100rem 50rem at 100% -4%, var(--glow-cyan), transparent 54%),
       repeating-radial-gradient(circle at 0 0, rgba(8, 47, 73, 0.018) 0 1px, transparent 1px 7px),
-      linear-gradient(180deg, #f5fbff 0%, #ecf7ff 42%, #f5fbff 100%);
+      var(--bg-gradient);
     background-attachment: fixed;
     min-height: 100vh;
   }

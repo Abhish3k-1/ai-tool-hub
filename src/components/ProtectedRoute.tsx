@@ -13,7 +13,8 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     const hasNotifiedRef = useRef(false);
 
     useEffect(() => {
-        if (!loading && !user && pathname !== '/') {
+        // Only redirect if loading is finished AND there's no user AND we're not on the login page
+        if (!loading && !user && pathname !== '/' && pathname !== '/login') {
             if (!hasNotifiedRef.current) {
                 showToast('Please sign in first to continue.', 'warning');
                 hasNotifiedRef.current = true;
