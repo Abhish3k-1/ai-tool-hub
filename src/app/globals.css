@@ -87,39 +87,7 @@
   --glow-cyan: rgba(14, 165, 233, 0.22);
 }
 
-.dark {
-  --background: #0b1220;
-  --foreground: #eaf6ff;
-  --card: #0f1b2e;
-  --card-foreground: #eaf6ff;
-  --popover: #0f1b2e;
-  --popover-foreground: #eaf6ff;
-  --primary: #38bdf8;
-  --primary-foreground: #082032;
-  --secondary: #13243a;
-  --secondary-foreground: #eaf6ff;
-  --muted: #13243a;
-  --muted-foreground: #9fb9cf;
-  --accent: #1e293b;
-  --accent-foreground: #eaf6ff;
-  --destructive: #7f1d1d;
-  --border: #2b3f59;
-  --input: #2b3f59;
-  --ring: #6fa4ce;
-  --chart-1: #38bdf8;
-  --chart-2: #0ea5e9;
-  --chart-3: #0284c7;
-  --chart-4: #1d4ed8;
-  --chart-5: #4338ca;
-  --sidebar: #0f1b2e;
-  --sidebar-foreground: #eaf6ff;
-  --sidebar-primary: #38bdf8;
-  --sidebar-primary-foreground: #082032;
-  --sidebar-accent: #13243a;
-  --sidebar-accent-foreground: #eaf6ff;
-  --sidebar-border: #2b3f59;
-  --sidebar-ring: #6fa4ce;
-}
+
 
 /* Isolated Resume Preview Styling */
 .resume-preview-container {
