@@ -38,16 +38,16 @@ export default function Sidebar() {
                     >
                         <div
                             className={cn(
-                                'mb-2 flex border-b border-sky-100/80 pb-3',
+                                'mb-2 flex border-b border-sky-100/80 pb-3 dark:border-slate-800/80',
                                 expanded ? 'items-center gap-2 px-2' : 'justify-center px-1'
                             )}
                         >
-                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 text-white shadow-[0_6px_18px_rgba(3,105,161,0.28)]">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 text-white shadow-[0_6px_18px_rgba(3,105,161,0.28)] dark:from-sky-600 dark:to-cyan-600">
                                 <Sparkles className="h-4 w-4" />
                             </div>
                             <span
                                 className={cn(
-                                    'overflow-hidden whitespace-nowrap text-sm font-semibold text-slate-700 transition-all duration-200',
+                                    'overflow-hidden whitespace-nowrap text-sm font-semibold text-slate-700 transition-all duration-200 dark:text-slate-200',
                                     expanded ? 'max-w-[140px] opacity-100' : 'max-w-0 opacity-0'
                                 )}
                             >
@@ -67,14 +67,14 @@ export default function Sidebar() {
                                             'group relative flex items-center rounded-2xl py-2.5 text-sm font-semibold transition-all duration-200',
                                             expanded ? 'gap-3 px-2.5' : 'justify-center px-1.5',
                                             isActive
-                                                ? 'bg-gradient-to-r from-sky-500/15 to-cyan-500/10 text-slate-900 ring-1 ring-sky-200/70'
-                                                : 'text-slate-600 hover:bg-white/80 hover:text-slate-900'
+                                                ? 'bg-gradient-to-r from-sky-500/15 to-cyan-500/10 text-slate-900 ring-1 ring-sky-200/70 dark:from-sky-500/10 dark:to-cyan-500/5 dark:text-slate-100 dark:ring-sky-900/50'
+                                                : 'text-slate-600 hover:bg-white/80 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-100'
                                         )}
                                     >
                                         <span
                                             className={cn(
-                                                'flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/70 bg-white/75 transition-all',
-                                                isActive && 'border-sky-100 bg-white shadow-sm'
+                                                'flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/70 bg-white/75 transition-all dark:border-slate-800/70 dark:bg-slate-900/75',
+                                                isActive && 'border-sky-100 bg-white shadow-sm dark:border-sky-900 dark:bg-slate-900'
                                             )}
                                         >
                                             <item.icon className={cn('h-[18px] w-[18px]', item.color)} />
@@ -92,7 +92,7 @@ export default function Sidebar() {
                             })}
                         </div>
 
-                        <div className="mt-2 border-t border-sky-100/80 px-2 pt-3 text-xs font-medium text-slate-500">
+                        <div className="mt-2 border-t border-sky-100/80 px-2 pt-3 text-xs font-medium text-slate-500 dark:border-slate-800/80 dark:text-slate-500">
                             <span className={cn('overflow-hidden whitespace-nowrap transition-all duration-200', expanded ? 'inline-block max-w-[180px] opacity-100' : 'inline-block max-w-0 opacity-0')}>
                                 AI Tools Hub v1.0
                             </span>
@@ -101,7 +101,7 @@ export default function Sidebar() {
                 </div>
             </aside>
 
-            <nav className="fixed inset-x-0 bottom-3 z-40 mx-auto w-[calc(100%-1rem)] max-w-md rounded-2xl border border-sky-100/80 bg-white/90 p-2 shadow-[0_12px_28px_rgba(8,47,73,0.14)] backdrop-blur-xl md:hidden">
+            <nav className="fixed inset-x-0 bottom-3 z-40 mx-auto w-[calc(100%-1rem)] max-w-md rounded-2xl border border-sky-100/80 bg-white/90 p-2 shadow-[0_12px_28px_rgba(8,47,73,0.14)] backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/90 md:hidden">
                 <div className="grid gap-1 grid-cols-4">
                     {menuItems.map((item) => {
                         const isActive = pathname === item.href;
@@ -113,8 +113,8 @@ export default function Sidebar() {
                                 className={cn(
                                     'flex flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-medium transition-all',
                                     isActive
-                                        ? 'bg-sky-100/80 text-slate-900 ring-1 ring-sky-200'
-                                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                                        ? 'bg-sky-100/80 text-slate-900 ring-1 ring-sky-200 dark:bg-sky-900/30 dark:text-slate-100 dark:ring-sky-900'
+                                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-900/50 dark:hover:text-slate-300'
                                 )}
                             >
                                 <item.icon className={cn('h-4 w-4', item.color)} />

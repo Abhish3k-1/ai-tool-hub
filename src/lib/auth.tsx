@@ -49,8 +49,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
 
             try {
+                // IMPORTANT: getRedirectResult only works once per redirect flow.
                 const redirectResult = await getRedirectResult(auth);
                 if (redirectResult?.user && mounted) {
+                    console.log('Redirect sign-in successful:', redirectResult.user.email);
                     await setDoc(doc(db, 'users', redirectResult.user.uid), {
                         uid: redirectResult.user.uid,
                         email: redirectResult.user.email,
@@ -59,11 +61,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                         lastLogin: serverTimestamp(),
                         role: redirectResult.user.email === 'absihekdas@gmail.com' ? 'admin' : 'user'
                     }, { merge: true });
+                    
                     setUser(redirectResult.user);
-                    router.push('/dashboard');
+                    // Only redirect if we're on the home/login page
+                    if (window.location.pathname === '/' || window.location.pathname === '/login') {
+                        router.push('/dashboard');
+                    }
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Redirect sign-in error:', error);
+                if (error.code === 'auth/credential-already-in-use') {
+                    // Handle case where account is already linked or in use
+                }
             }
         };
 
@@ -71,9 +80,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (!mounted) return;
-            setUser(firebaseUser);
             
             if (firebaseUser) {
+                setUser(firebaseUser);
                 // Fetch role from Firestore
                 try {
                     const { getDoc, doc } = await import('firebase/firestore');
@@ -85,9 +94,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     console.error('Error fetching role:', err);
                 }
             } else {
+                setUser(null);
                 setRole(null);
             }
             
+            // Ensure we set loading to false only after initial check
             setLoading(false);
         });
 

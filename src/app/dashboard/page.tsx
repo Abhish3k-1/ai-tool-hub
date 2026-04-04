@@ -61,23 +61,23 @@ export default function DashboardPage() {
         <ProtectedRoute>
             <div className="relative mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8">
                 <div className="pointer-events-none absolute inset-0 -z-10">
-                    <div className="absolute left-[-14%] top-[-5%] h-72 w-72 rounded-full bg-sky-500/15 blur-3xl" />
-                    <div className="absolute right-[-10%] top-16 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
+                    <div className="absolute left-[-14%] top-[-5%] h-72 w-72 rounded-full bg-sky-500/15 blur-3xl dark:bg-sky-500/10" />
+                    <div className="absolute right-[-10%] top-16 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl dark:bg-cyan-400/10" />
                 </div>
 
                 <section className="glass-panel page-enter relative overflow-hidden rounded-3xl p-6 sm:p-8">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/35 via-white/10 to-sky-100/35" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/35 via-white/10 to-sky-100/35 dark:from-slate-900/40 dark:via-slate-900/20 dark:to-slate-800/40" />
                     <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr] lg:gap-8">
                         <div>
-                            <div className="inline-flex items-center gap-2 rounded-full border border-sky-200/70 bg-white/85 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-sky-700">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-sky-200/70 bg-white/85 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-sky-700 dark:border-sky-900/50 dark:bg-slate-900/80 dark:text-sky-300">
                                 <Sparkles className="h-4 w-4" />
                                 Overview
                             </div>
 
-                            <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl xl:text-5xl">
+                            <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl xl:text-5xl">
                                 Welcome back, {firstName}.
                             </h1>
-                            <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
+                            <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-400 sm:text-lg">
                                 Your AI workspace is ready. Jump into your next workflow, launch a tool, and ship faster with one clean control center.
                             </p>
 
@@ -91,7 +91,7 @@ export default function DashboardPage() {
                                 </Link>
                                 <Link
                                     href="/tools/notes"
-                                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:bg-sky-50/70"
+                                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:bg-sky-50/70 dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-200 dark:hover:border-slate-700 dark:hover:bg-slate-800"
                                 >
                                     Open Notes
                                     <ArrowUpRight className="h-4 w-4" />
@@ -129,10 +129,10 @@ export default function DashboardPage() {
                         <div key={stat.label} className="hover-lift glass-card rounded-2xl p-5">
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                                         {stat.label}
                                     </p>
-                                    <p className="mt-2 text-3xl font-black tracking-tight text-slate-900">
+                                    <p className="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-slate-50">
                                         {stat.value}
                                     </p>
                                 </div>
@@ -140,15 +140,15 @@ export default function DashboardPage() {
                                     <stat.icon className="h-5 w-5" />
                                 </span>
                             </div>
-                            <p className="mt-3 text-sm text-slate-600">{stat.helper}</p>
+                            <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">{stat.helper}</p>
                         </div>
                     ))}
                 </section>
 
                 <section className="mt-8 space-y-5">
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                        <h2 className="text-xl font-semibold text-slate-900 sm:text-2xl">Your Tools</h2>
-                        <span className="rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                        <h2 className="text-xl font-semibold text-slate-900 dark:text-white sm:text-2xl">Your Tools</h2>
+                        <span className="rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-400">
                             Productivity Suite
                         </span>
                     </div>
@@ -172,7 +172,7 @@ export default function DashboardPage() {
                             description="Deeply analyze any topic with Firecrawl's real-time web awareness."
                             href="/tools/ai-research"
                             icon={Globe}
-                            colorClass="text-sky-600 bg-sky-50"
+                            colorClass="text-sky-600 bg-sky-50 dark:text-sky-400 dark:bg-sky-900/30"
                         />
                     </div>
                 </section>
